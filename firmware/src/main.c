@@ -5,20 +5,27 @@
 #include <util/delay.h>
 #include <util/setbaud.h>
 #include <inttypes.h>
+#include "io.h"
+#include "bitio.h"
 
-//fan connected to PC0
+/*fan connection
+ */
+//connected to PC0
 #define PORT_FAN PORTC
 //pin number of fan in PORT_FAN
 #define PFAN PC0
 #define DDR_FAN DDRC
 #define DDFAN DDC0
 
-//compressor connecte to PD4
+/*compressor connection
+ */
+//connected to PD4
 #define PORT_COMP PORTD
 //pin number of compressor in PORT_COMP
 #define PCOMP PD4
 #define DDR_COMP DDRD
 #define DDCOMP DDD4
+
 
 void uart_init(void)
 {
@@ -53,40 +60,42 @@ void uart_putc(unsigned char c)
 //Fan control routines
 void start_fan(void)
 {
-    PORT_FAN |= 1 << PFAN;
+    setbit(PORT_FAN, PFAN);
 }
 
 void stop_fan(void)
 {
-    PORT_FAN &= ~(1 << PFAN);
+    clearbit(PORT_FAN, PFAN);
 }
 
 void toggle_fan(void)
 {
-    PORT_FAN ^= 1 << PFAN;
+    togglebit(PORT_FAN, PFAN);
 }
 
 //Compressor control routines
 void start_comp(void)
 {
-    PORT_COMP |= 1 << PCOMP;
+    setbit(PORT_COMP, PCOMP);
 }
 
 void stop_comp(void)
 {
-    PORT_COMP &= ~(1 << PCOMP);
+    clearbit(PORT_COMP, PCOMP);
 }
 
 void toggle_comp(void)
 {
-    PORT_COMP ^= 1 << PCOMP;
+    togglebit(PORT_COMP, PCOMP);
 }
 
 void init(void) {
     uart_init();
     //make compressor and fan outputs
-    DDR_FAN = 1 << DDFAN;
-    DDR_COMP = 1 << DDCOMP;
+    setbit(DDR_FAN, DDFAN);
+    setbit(DDR_COMP, DDCOMP);
+    //initialize input/output panel
+    //io_init();
 }
 
 int main(void)
