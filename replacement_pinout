@@ -13,7 +13,7 @@ OrigPin AVRPin          Connected to
 12                      CN1.3
 13                      VCC
 14                      Oscillator
-15                      Oscrillator
+15                      Oscsillator
 16                      CN1.4
 17                      CN1.5
 18       PC0            transistor -> relay -> FAN_H

@@ -7,6 +7,7 @@ PG_TYPE = stk500
 PG_PORT = /dev/ttyUSB0
 
 compile: main.c
+	@test -d $(BUILD_DIR) || (mkdir $(BUILD_DIR) && echo -e "Created $(BUILD_DIR)/ directory")
 	$(CC) $(CC_ARGS) -mmcu=atmega8 -O1 -o $(BUILD_DIR)/main main.c
 
 burn: compile
