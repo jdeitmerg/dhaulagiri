@@ -1,0 +1,21 @@
+OrigPin AVRPin          Connected to
+1                       CN6.CLK
+2                       CN6.DAT + IC4.SDA
+3                       CN6.KEY
+4                       transistor -> CN6.LEDC
+5                       CN6.DIS0
+6                       CN6.DIS1
+7                       some circuitry -> CN2
+8                       GND
+9                       some circuitry -> CN2
+10                      CN3.3
+11                      CN1.1
+12                      CN1.3
+13                      VCC
+14                      Oscillator
+15                      Oscrillator
+16                      CN1.4
+17                      CN1.5
+18       PC0            transistor -> relay -> FAN_H
+19       PD4            transistor -> relay -> compressor
+20       PD3            CN6.SCL
