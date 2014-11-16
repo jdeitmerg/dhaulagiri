@@ -1,0 +1,69 @@
+Main IC, 'IC1'
+==============
+Label
+-----
+    SH69P42
+    1032-E 02000
+    NSFR1-1
+Description
+-----------
+    OTP 4-bit Microcontroller
+Pinout
+------
+  PIN   Controller      Connected to
+  1     PORTE.2         CN6.CLK
+  2     PORTE.3         CN6.DAT + IC4.SDA
+  3     PORTD.2         CN6.KEY
+  4     PORTD.3/PWM1    transistor -> CN6.LEDC
+  5     PORTC.2/PWM0    CN6.DIS0
+  6     PORTC.3/T0      CN6.DIS1
+  7     ~RESET/Vpp      some circuitry -> CN2
+  8     GND             GND
+  9     PORTA.0/AN0/SDA some circuitry -> CN2
+  10    PORTA.1/AN1     CN3.3
+  11    PORTB.2/AN6     CN1.1
+  12    PORTB.2/AN6     CN1.3
+  13    VDD             VCC
+  14    OSCI/SCK        Oscillator
+  15    OSCO/PORTC.0    Oscrillator
+  16    PORTC.1/Vref    CN1.4
+  17    PORTD.0         CN1.5
+  18    PORTD.1         transistor -> relay -> FAN_H
+  19    PORTE.0         transistor -> relay -> compressor
+  20    PORTE.1         CN6.SCL
+
+'IC4'
+=====
+Label
+-----
+    ST CHN
+    24CO4WP
+    KEVO41
+Description
+-----------
+    4 Kbit Serial IC2 EEPROM
+
+Display Connector 'CN6'
+=======================
+Pinout (top to bottom)
+----------------------
+1   DIS1
+2   DIS0
+3   LEDC
+4   KEY
+5   +5V
+6   GND
+7   DAT
+8   CLK
+
+Temperature Sensor Connector 'CN2'
+==================================
+Label
+-----
+    PPE
+
+Water Sensor Connector 'CN3'
+============================
+
+Humidity Sensor Connector 'CN1'
+===============================
