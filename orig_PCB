@@ -30,7 +30,7 @@ Pinout
   17    PORTD.0         CN1.5
   18    PORTD.1         transistor -> relay -> FAN_H
   19    PORTE.0         transistor -> relay -> compressor
-  20    PORTE.1         CN6.SCL
+  20    PORTE.1         IC4.SCL
 
 'IC4'
 =====

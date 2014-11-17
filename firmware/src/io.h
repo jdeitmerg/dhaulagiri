@@ -35,11 +35,6 @@
 #define PIODIS1     PB7
 #define DDR_IODIS1  DDRB
 #define DDIODIS1    DDB7
-//SCL:
-#define PORT_IOSCL  PORTD
-#define PIOSCL      PD3
-#define DDR_IOSCL   DDRD
-#define DDIOSCL     DDD3
 
 void io_init(void);
 

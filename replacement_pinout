@@ -18,4 +18,4 @@ OrigPin AVRPin          Connected to
 17                      CN1.5
 18       PC0            transistor -> relay -> FAN_H
 19       PD4            transistor -> relay -> compressor
-20       PD3            CN6.SCL
+20       PD3            IC4.SCL
