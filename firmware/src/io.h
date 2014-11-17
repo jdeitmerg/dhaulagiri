@@ -17,6 +17,7 @@
 #define DDIODAT     DDC5
 //KEY:
 #define PORT_IOKEY  PORTC
+#define PIN_IOKEY   PINC
 #define PIOKEY      PC4
 #define DDR_IOKEY   DDRC
 #define DDIOKEY     DDC4
@@ -36,6 +37,13 @@
 #define DDR_IODIS1  DDRB
 #define DDIODIS1    DDB7
 
+//Three LEDs on the IO panel:
+#define LED_ONOFF   0x00
+#define LED_WATER   0x02
+#define LED_CONT    0x04
+
 void io_init(void);
+void io_LEDs_raw(uint8_t state);
+void shiftr_setval(uint8_t value);
 
 #endif

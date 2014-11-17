@@ -1,12 +1,6 @@
-#define F_CPU 1000000UL
-#define BAUD 2400UL
-
 #include <avr/io.h>
-#include <util/delay.h>
-#include <util/setbaud.h>
-#include <inttypes.h>
 #include "io.h"
-#include "bitio.h"
+#include "common.h"
 
 /*fan connection
  */
@@ -102,6 +96,7 @@ int main(void)
 {
     init();
 
+    /*
     char action;
     while(1)
     {
@@ -110,5 +105,14 @@ int main(void)
             toggle_comp();
         else if(action == 'f')
             toggle_fan();
+    }
+    */
+
+    shiftr_setval(0xFF);
+
+    while(1)
+    {
+        shiftr_setval(0xFF);
+        //io_LEDs_raw(LED_ONOFF | LED_WATER | LED_CONT);
     }
 }
