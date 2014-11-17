@@ -1,38 +1,45 @@
 #ifndef IO_H
 #define IO_H
 
-/*input/output panel connections (not soldered yet)
+#include <avr/io.h>
+
+/*input/output panel connections
  */
 //CLK: 
-#define PORT_IOCLK
-#define PIOCLK
-#define DDR_IOCLK
-#define DDIOCLK
+#define PORT_IOCLK  PORTD
+#define PIOCLK      PD2
+#define DDR_IOCLK   DDRD
+#define DDIOCLK     DDD2
 //DAT:
-#define PORT_IODAT
-#define PIODAT
-#define DDR_IODAT
-#define DDIODAT
+#define PORT_IODAT  PORTC
+#define PIODAT      PC5
+#define DDR_IODAT   DDRC
+#define DDIODAT     DDC5
 //KEY:
-#define PORT_IOKEY
-#define PIOKEY
-#define DDR_IOKEY
-#define DDIOKEY
+#define PORT_IOKEY  PORTC
+#define PIOKEY      PC4
+#define DDR_IOKEY   DDRC
+#define DDIOKEY     DDC4
 //LEDC:
-#define PORT_IOLED
-#define PIOLED
-#define DDR_IOLED
-#define DDIOLED
+#define PORT_IOLED  PORTC
+#define PIOLED      PC3
+#define DDR_IOLED   DDRC
+#define DDIOLED     DDC3
 //DIS0:
-#define PORT_IODIS0
-#define PIODIS0
-#define DDR_IODIS0
-#define DDIODIS0
+#define PORT_IODIS0 PORTB
+#define PIODIS0     PB6
+#define DDR_IODIS0  DDRB
+#define DDIODIS0    DDB6
 //DIS1:
-#define PORT_IODIS1
-#define PIODIS1
-#define DDR_IODIS1
-#define DDIODIS1
+#define PORT_IODIS1 PORTB
+#define PIODIS1     PB7
+#define DDR_IODIS1  DDRB
+#define DDIODIS1    DDB7
+//SCL:
+#define PORT_IOSCL  PORTD
+#define PIOSCL      PD3
+#define DDR_IOSCL   DDRD
+#define DDIOSCL     DDD3
 
 void io_init(void);
 

@@ -11,20 +11,20 @@
 /*fan connection
  */
 //connected to PC0
-#define PORT_FAN PORTC
+#define PORT_FAN    PORTC
 //pin number of fan in PORT_FAN
-#define PFAN PC0
-#define DDR_FAN DDRC
-#define DDFAN DDC0
+#define PFAN        PC0
+#define DDR_FAN     DDRC
+#define DDFAN       DDC0
 
 /*compressor connection
  */
 //connected to PD4
-#define PORT_COMP PORTD
+#define PORT_COMP   PORTD
 //pin number of compressor in PORT_COMP
-#define PCOMP PD4
-#define DDR_COMP DDRD
-#define DDCOMP DDD4
+#define PCOMP       PD4
+#define DDR_COMP    DDRD
+#define DDCOMP      DDD4
 
 
 void uart_init(void)
