@@ -89,7 +89,7 @@ void init(void) {
     setbit(DDR_FAN, DDFAN);
     setbit(DDR_COMP, DDCOMP);
     //initialize input/output panel
-    //io_init();
+    io_init();
 }
 
 int main(void)
