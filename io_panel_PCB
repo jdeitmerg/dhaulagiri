@@ -1,0 +1,62 @@
+Main Connector 'CN11'
+=====================
+Pinout (top to bottom)
+----------------------
+1   DIS1
+2   DIS0
+3   LEDC
+4   KEY
+5   +5V
+6   GND
+7   DAT
+8   CLK
+
+Shift register pin current
+==========================
+Measurements
+------------
+ -> when only one LED is on:
+    LED1 on
+        Voltage at Q_A (shift reg pin)       .26V
+        Voltage 'behind' R20                3.00V
+                                            -----
+        Voltage over R20                    2.74V
+        Value of R20                      330   R
+                                          -------
+        Current through Q_A                 8.3 mA
+ 
+ -> when only one Segment of 7seg display is on:
+    7SEG.8 (top element) on (LED1 glows a little)
+        Voltage at Q_A (shift reg pin)       .26V
+        Voltage 'behind' R20                2.98V
+                                            -----
+        Voltage over R20                    2.68V
+        Value of R20                      330   R
+                                          -------
+        Current through Q_A                 8.1 mA
+
+    7SEG.4 (bottom left element)
+        Voltage at Q_E (shift reg pin)       .26V
+        Voltage 'behind' R18                2.96V
+                                            -----
+        Voltage over R18                    2.66V
+        Value of R18                      330   R
+                                          -------
+        Current through Q_E                 8.1 mA
+
+Conclusions
+-----------
+1)  Though the LEDs glow a little, when the corresponding 7seg element is
+    on, it doesn't add much to the current drawn.
+
+2)  It's save to power all 3 LEDs at the same time, as the combined output
+    current by far doesn't excess the 50mA through VCC or GND rating.
+    The single output currents are also far below the specified 20mA maximum
+    output clamp current.
+
+3)  Powering all 8 7seg elements at the same time is a little risky, as the
+    combined current would be around 65mA, which is above the maximum rating
+    of current through VCC or GND.
+    When continuously cycling through LEDs, KEYs, DIS0 and DIS1, the maximum
+    rating would only be excessed < 50% of the time, so we don't need to worry
+    too much. (Test pending)

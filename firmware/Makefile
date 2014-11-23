@@ -11,7 +11,7 @@ MMCU = atmega8
 
 compile: $(SRC_DIR)/main.c $(SRC_DIR)/io.c $(SRC_DIR)/io.h $(SRC_DIR)/common.h
 	@test -d $(BUILD_DIR) || (mkdir $(BUILD_DIR) && echo -e "Created $(BUILD_DIR)/ directory")
-	#it would be nice to have avr-gcc warn about declared/defined functions that aren't used anywhere. Seems like that's hard to achieve...
+	@#it would be nice to have avr-gcc warn about declared/defined functions that aren't used anywhere. Seems like that's hard to achieve...
 	$(CC) $(CC_ARGS) -mmcu=$(MMCU) -O1 -o $(BUILD_DIR)/main $(SRC_DIR)/main.c $(SRC_DIR)/io.c
 
 burn: compile

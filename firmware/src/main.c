@@ -96,23 +96,22 @@ int main(void)
 {
     init();
 
-    /*
-    char action;
     while(1)
     {
-        action = (char) uart_getc();
-        if(action == 'c')
-            toggle_comp();
-        else if(action == 'f')
-            toggle_fan();
-    }
-    */
+        //simple blink pattern
+        io_set_LEDs(LED_ONOFF);
+        _delay_ms(500);
+        io_set_LEDs(LED_WATER);
+        _delay_ms(500);
+        io_set_LEDs(LED_CONT);
+        _delay_ms(500);
 
-    shiftr_setval(0xFF);
-
-    while(1)
-    {
-        shiftr_setval(0xFF);
-        //io_LEDs_raw(LED_ONOFF | LED_WATER | LED_CONT);
+        io_set_LEDs(0);
+        _delay_ms(500);
+        io_set_LEDs(LED_ONOFF | LED_WATER | LED_CONT);
+        _delay_ms(500);
+        io_set_LEDs(0);
+        _delay_ms(500);
     }
+
 }

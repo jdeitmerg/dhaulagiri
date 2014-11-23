@@ -38,12 +38,11 @@
 #define DDIODIS1    DDB7
 
 //Three LEDs on the IO panel:
-#define LED_ONOFF   0x00
-#define LED_WATER   0x02
-#define LED_CONT    0x04
+#define LED_ONOFF   0x01
+#define LED_WATER   0x04
+#define LED_CONT    0x08
 
 void io_init(void);
-void io_LEDs_raw(uint8_t state);
-void shiftr_setval(uint8_t value);
+void io_set_LEDs(uint8_t state);
 
 #endif

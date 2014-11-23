@@ -16,6 +16,16 @@ void io_init(void)
     clearbit(PORT_IOCLK, PIOCLK);   //low by default
 }
 
+inline void pulse_ioclk()
+{
+    //short pulse on CLK, "clocking occurs on the low-to-high-level transition"
+    //assume CLK line is low!
+    setbit(PORT_IOCLK, PIOCLK);
+    _delay_loop_1(2);   //works without waiting, but pulsing at 1 MHz might
+                        //be a bit of an overkill (we wait around 6 cycles)
+    clearbit(PORT_IOCLK, PIOCLK);
+}
+
 inline void shiftr_pushb(uint8_t bit)
 /*Push a single bit into the shift register of the IO panel (IC5)
  */
@@ -28,21 +38,23 @@ inline void shiftr_pushb(uint8_t bit)
     {
         clearbit(PORT_IODAT, PIODAT);
     }
-    //short pulse on CLK
-    setbit(PORT_IOCLK, PIOCLK);
-    _delay_loop_1(10);  //we can make this value smaller as soon as we know
-                        //this works.
-    clearbit(PORT_IOCLK, PIOCLK);
+
+    pulse_ioclk();
 }
 
 void shiftr_update()
 /*Pushes shiftr_state into the shift register of the IO panel (IC5)
  */
 {
-    uint8_t i;
-    for(i = 0; i < 8; ++i)
+    uint8_t i = 8;
+    while(1)
     {
-        shiftr_pushb((1 << i) & shiftr_state);
+        i--;
+        shiftr_pushb(testbit(shiftr_state, i));
+        if(i == 0)
+        {
+            break;
+        }
     }
 }
 
@@ -66,14 +78,18 @@ void shiftr_clearbit(uint8_t bit)
     shiftr_update();
 }
 
+/*There's a transistor between the AVR pin and the LEDC pin, so our signal
+ *get's inverted.
+ */
+
 inline void set_LEDC()
 {
-    setbit(PORT_IOLED, PIOLED);
+    clearbit(PORT_IOLED, PIOLED);
 }
 
 inline void clear_LEDC()
 {
-    clearbit(PORT_IOLED, PIOLED);
+    setbit(PORT_IOLED, PIOLED);
 }
 
 inline void toggle_LEDC()
@@ -132,38 +148,15 @@ uint8_t io_switches_raw(void)
     return(state);
 }
 
-void io_LEDs_raw(uint8_t state)
+void io_set_LEDs(uint8_t state)
 /*Set the LEDs according to the given state (probably ored LED_*)
  */
 {
     clear_DIS0();
     clear_DIS1();
 
-    //Turn them on and off, one after the other
-    if(state & LED_ONOFF)
-    {
-        clear_LEDC();   //We don't know the output of the shift register yet
-        shiftr_setval(~LED_ONOFF);
-        set_LEDC();
-
-        _delay_ms(400); //For testing
-    }
-
-    if(state & LED_WATER)
-    {
-        clear_LEDC();
-        shiftr_setval(~LED_WATER);
-        set_LEDC();
-
-        _delay_ms(400); //For testing
-    }
-
-    if(state & LED_CONT)
-    {
-        clear_LEDC();
-        shiftr_setval(~LED_CONT);
-        set_LEDC();
-
-        _delay_ms(400); //For testing
-    }
+    //It's save to power all LEDs at the same time (see file io_panel_PCB)
+    clear_LEDC();
+    shiftr_setval(~state);
+    set_LEDC();
 }
