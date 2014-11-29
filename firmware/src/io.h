@@ -44,5 +44,6 @@
 
 void io_init(void);
 void io_set_LEDs(uint8_t state);
+void io_test(void);
 
 #endif

@@ -46,11 +46,11 @@ Measurements
 
 Conclusions
 -----------
-1)  Though the LEDs glow a little, when the corresponding 7seg element is
+1)  Though the LEDs glow a little when the corresponding 7seg element is
     on, it doesn't add much to the current drawn.
 
 2)  It's save to power all 3 LEDs at the same time, as the combined output
-    current by far doesn't excess the 50mA through VCC or GND rating.
+    current by far doesn't exceed the 50mA through VCC or GND rating.
     The single output currents are also far below the specified 20mA maximum
     output clamp current.
 
@@ -58,5 +58,5 @@ Conclusions
     combined current would be around 65mA, which is above the maximum rating
     of current through VCC or GND.
     When continuously cycling through LEDs, KEYs, DIS0 and DIS1, the maximum
-    rating would only be excessed < 50% of the time, so we don't need to worry
+    rating would only be exceeded < 50% of the time, so we don't need to worry
     too much. (Test pending)

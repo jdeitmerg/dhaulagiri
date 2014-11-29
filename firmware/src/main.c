@@ -96,6 +96,8 @@ int main(void)
 {
     init();
 
+    io_test();
+
     while(1)
     {
         //simple blink pattern
