@@ -1,5 +1,4 @@
 #include <util/delay_basic.h>
-#include <avr/interrupt.h>
 #include "common.h"
 #include "io.h"
 
@@ -127,8 +126,6 @@ void io_init(void)
     setbit(TCCR0, CS00);
     //enable timer0 overflow interrupt
     setbit(TIMSK, TOIE0);
-    //enable global interrupts
-    sei();
 }
 
 inline void pulse_ioclk()

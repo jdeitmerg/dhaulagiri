@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include "io.h"
 #include "common.h"
+#include "timer.h"
 
 /*fan connection
  */
@@ -90,6 +91,11 @@ void init(void) {
     setbit(DDR_COMP, DDCOMP);
     //initialize input/output panel
     io_init();
+    //initialize timer
+    timer_init();
+
+    //everything is set up, globally enable interrupts
+    sei();
 }
 
 int main(void)
