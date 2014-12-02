@@ -2,6 +2,7 @@ typedef struct {
     void (*funcptr)(void);
     uint32_t interval;
     uint32_t downscaled;
+    uint32_t countdown;
 } timer;
 
 void timer_init(void);

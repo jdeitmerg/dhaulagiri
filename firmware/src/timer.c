@@ -96,6 +96,7 @@ void register_timer(void (*fptr)(void), uint32_t ival)
     while(timers[i].funcptr != 0)
     {
         timers[i].downscaled = timers[i].interval/presc;
+        timers[i].countdown = timers[i].downscaled;
         i++;
     }
 
@@ -107,6 +108,22 @@ void register_timer(void (*fptr)(void), uint32_t ival)
 }
 
 ISR(TIMER1_COMPA_vect)
+/*Everytime we get this interrupt, we have to check if any of the registered
+ *timers wants to have it's function called. That's what the scaled countdown
+ *of all the timers is for; we count them down each time this routine is
+ *called. If the countdown becomes 0, we call the function and reset it to the
+ *downscaled interval
+ */
 {
-
+    //loop thugh all timers
+    uint8_t i = 0;
+    while(timers[i].funcptr != 0)
+    {
+        if(--timers[i].countdown == 0)
+        {
+            timers[i].funcptr();
+            timers[i].countdown = timers[i].downscaled;
+        }
+        i++;
+    }
 }
