@@ -89,10 +89,10 @@ void init(void) {
     //make compressor and fan outputs
     setbit(DDR_FAN, DDFAN);
     setbit(DDR_COMP, DDCOMP);
+    //initialize timer (needed by io_init())
+    timer_init();
     //initialize input/output panel
     io_init();
-    //initialize timer
-    timer_init();
 
     //everything is set up, globally enable interrupts
     sei();

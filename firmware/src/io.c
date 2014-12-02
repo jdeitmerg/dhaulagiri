@@ -1,6 +1,7 @@
 #include <util/delay_basic.h>
 #include "common.h"
 #include "io.h"
+#include "timer.h"
 
 //State of outputs
 uint8_t LEDs_state;
@@ -123,9 +124,10 @@ void io_init(void)
 
     //timer0: interrupt every 256 cycles (about 4kHz)
     //set clock source (no prescaling) (and by doing so enable timer)
-    setbit(TCCR0, CS00);
+    //setbit(TCCR0, CS00);
     //enable timer0 overflow interrupt
-    setbit(TIMSK, TOIE0);
+    //setbit(TIMSK, TOIE0);
+    register_timer(&disp_pulse, 4096);
 }
 
 inline void pulse_ioclk()
@@ -172,7 +174,8 @@ void shiftr_setval(uint8_t value)
 }
 
 //timer 0 overflow interrupt routine
-ISR(TIMER0_OVF_vect)
+//ISR(TIMER0_OVF_vect)
+void disp_pulse(void)
 {
     static volatile uint8_t curr_state;  //current state
 
