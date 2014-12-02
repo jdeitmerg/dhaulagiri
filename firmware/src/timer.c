@@ -18,11 +18,11 @@ void register_timer(void (*fptr)(void), uint32_t ival)
     uint32_t smallest = 0xFFFFFFFF; //smallest interval
 
     //loop through all registered timers to find smallest intervals
-    while(timers[i].funcptr != NULL)
+    while(timers[i].funcptr != 0)
     {
         if(timers[i].interval < smallest)
         {
-            smallest = timers[i].interval
+            smallest = timers[i].interval;
         }
         i++;
     }
@@ -44,9 +44,9 @@ void register_timer(void (*fptr)(void), uint32_t ival)
              */
             i = 0;
             found = 1;
-            while(timers[i].funcptr != NULL)
+            while(timers[i].funcptr != 0)
             {
-                if(timers[i]%gcd != 0)
+                if(timers[i].interval%gcd != 0)
                 {
                     found = 0;
                     break;
@@ -93,7 +93,7 @@ void register_timer(void (*fptr)(void), uint32_t ival)
 
     //Now that we have the clock prescaler, scale all the timers down
     i = 0;
-    while(timers[i].funcptr != NULL)
+    while(timers[i].funcptr != 0)
     {
         timers[i].downscaled = timers[i].interval/presc;
         i++;

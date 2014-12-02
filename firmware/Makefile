@@ -9,10 +9,10 @@ PG_PORT = /dev/ttyUSB0
 #AVR mmcu
 MMCU = atmega8
 
-compile: $(SRC_DIR)/main.c $(SRC_DIR)/io.c $(SRC_DIR)/io.h $(SRC_DIR)/common.h
+compile: $(SRC_DIR)/main.c $(SRC_DIR)/io.c $(SRC_DIR)/io.h $(SRC_DIR)/common.h $(SRC_DIR)/timer.c $(SRC_DIR)/timer.h
 	@test -d $(BUILD_DIR) || (mkdir $(BUILD_DIR) && echo -e "Created $(BUILD_DIR)/ directory")
 	@#it would be nice to have avr-gcc warn about declared/defined functions that aren't used anywhere. Seems like that's hard to achieve...
-	$(CC) $(CC_ARGS) -mmcu=$(MMCU) -O1 -o $(BUILD_DIR)/main $(SRC_DIR)/main.c $(SRC_DIR)/io.c
+	$(CC) $(CC_ARGS) -mmcu=$(MMCU) -O1 -o $(BUILD_DIR)/main $(SRC_DIR)/main.c $(SRC_DIR)/io.c $(SRC_DIR)/timer.c
 
 burn: compile
 	sudo avrdude -p m8 -c $(PG_TYPE) -P $(PG_PORT) -U flash:w:$(BUILD_DIR)/main
