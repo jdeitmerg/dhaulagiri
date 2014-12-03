@@ -107,20 +107,6 @@ int main(void)
 
     while(1)
     {
-        //simple blink pattern
-        io_set_LEDs(LED_ONOFF);
-        _delay_ms(500);
-        io_set_LEDs(LED_WATER);
-        _delay_ms(500);
-        io_set_LEDs(LED_CONT);
-        _delay_ms(500);
 
-        io_set_LEDs(0);
-        _delay_ms(500);
-        io_set_LEDs(LED_ONOFF | LED_WATER | LED_CONT);
-        _delay_ms(500);
-        io_set_LEDs(0);
-        _delay_ms(500);
     }
-
 }

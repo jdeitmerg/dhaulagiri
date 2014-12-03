@@ -122,12 +122,7 @@ void io_init(void)
     clear_DIS0();
     clear_DIS1();
 
-    //timer0: interrupt every 256 cycles (about 4kHz)
-    //set clock source (no prescaling) (and by doing so enable timer)
-    //setbit(TCCR0, CS00);
-    //enable timer0 overflow interrupt
-    //setbit(TIMSK, TOIE0);
-    register_timer(&disp_pulse, 4096);
+    register_timer(&disp_pulse, 1024);
 }
 
 inline void pulse_ioclk()
@@ -274,19 +269,19 @@ void ticker_pr(char str[])
     //At first, display only first char on right 7 segment
     DIS1_state = 0xFF;  //nothing on left display
     DIS0_state = dischar(str[0]);
-    _delay_ms(5);
+    _delay_ms(500);
     while(str[sp1] != 0)
     {
         DIS0_state = dischar(str[sp0]);
         DIS1_state = dischar(str[sp1]);
-        _delay_ms(5);
+        _delay_ms(500);
         sp0++;
         sp1++;
     }
     //flush the display
     DIS0_state = 0xFF;
     DIS1_state = 0xFF;
-    _delay_ms(5);
+    _delay_ms(500);
 }
 
 void io_test(void)

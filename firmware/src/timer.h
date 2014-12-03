@@ -1,3 +1,5 @@
+#define MAX_TIMERS 10 //how many timers you can register
+
 typedef struct {
     void (*funcptr)(void);
     uint32_t interval;

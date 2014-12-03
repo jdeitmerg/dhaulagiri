@@ -1,7 +1,8 @@
 #include "common.h"
 #include "timer.h"
 
-timer timers[10];   //Note: you can only register a maximum of 9 timers!
+timer timers[MAX_TIMERS];
+uint8_t num_timers = 0;
 
 void timer_init(void)
 {
@@ -13,19 +14,36 @@ void timer_init(void)
 }
 
 void register_timer(void (*fptr)(void), uint32_t ival)
+/*Register a function which is to be called every $inval cpu cycles. To get
+ *good performance, these intervals should all be powers of two (It should
+ *also work well with non power of two values, but for some reason it doesn't).
+ *Note that right now this doesn't return a value, so you don't know whether
+ *registering your timer worked. Also note there is no way to stop your
+ *function from being called yet.
+ */
 {
-    uint8_t i = 0;
+    if (num_timers == MAX_TIMERS)
+    {
+        return;
+    }
+
+    timers[num_timers].funcptr = fptr;
+    timers[num_timers].interval = ival;
+    num_timers++;
+
+
+    uint8_t i;
     uint32_t smallest = 0xFFFFFFFF; //smallest interval
 
     //loop through all registered timers to find smallest intervals
-    while(timers[i].funcptr != 0)
+    for(i = 0; i < num_timers; i++)
     {
         if(timers[i].interval < smallest)
         {
             smallest = timers[i].interval;
         }
-        i++;
     }
+
 
     /*Now, divide this interval by 1, 2, 3 (whatever is possible) and try to
      *divide the other intervals by that value. If it works, we have a common
@@ -42,16 +60,14 @@ void register_timer(void (*fptr)(void), uint32_t ival)
             /*loop through all intervals and see if they're dividable by
              *divisor
              */
-            i = 0;
             found = 1;
-            while(timers[i].funcptr != 0)
+            for(i = 0; i < num_timers; i++)
             {
                 if(timers[i].interval%gcd != 0)
                 {
                     found = 0;
                     break;
                 }
-                i++;
             }
             //Check if we broke. If not, we found our gcd!
             if(found)
@@ -61,6 +77,7 @@ void register_timer(void (*fptr)(void), uint32_t ival)
         }
         j++;
     }
+
 
     //Depending on our gcd, we can intelligently choose a clock prescaler.
     uint8_t clk_sel;
@@ -92,13 +109,12 @@ void register_timer(void (*fptr)(void), uint32_t ival)
     }
 
     //Now that we have the clock prescaler, scale all the timers down
-    i = 0;
-    while(timers[i].funcptr != 0)
+    for (i = 0; i < num_timers; i++)
     {
         timers[i].downscaled = timers[i].interval/presc;
         timers[i].countdown = timers[i].downscaled;
-        i++;
     }
+
 
     //The counter value at which we want to get an interrupt is gcd/presc
     OCR1A = (uint16_t)(gcd/presc);
@@ -116,14 +132,13 @@ ISR(TIMER1_COMPA_vect)
  */
 {
     //loop through all timers
-    uint8_t i = 0;
-    while(timers[i].funcptr != 0)
+    uint8_t i;
+    for(i = 0; i < num_timers; i++)
     {
         if(--timers[i].countdown == 0)
         {
             timers[i].funcptr();
             timers[i].countdown = timers[i].downscaled;
         }
-        i++;
     }
 }
