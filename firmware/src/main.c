@@ -22,8 +22,22 @@
 #define DDCOMP      DDD4
 
 
+//Like the glibc example
+int uart_putchar(char c, FILE* stream)
+{
+    if (c == '\n')
+    uart_putchar('\r', stream);
+    loop_until_bit_is_set(UCSRA, UDRE);
+    UDR = c;
+    return 0;
+}
+
+static FILE uart_output = FDEV_SETUP_STREAM(uart_putchar, NULL,
+                                            _FDEV_SETUP_WRITE);
+
 void uart_init(void)
 {
+    //also pretty much what the glibc pages tell you to do
     UBRRH = UBRRH_VALUE;
     UBRRL = UBRRL_VALUE;
     #if USE_2X
@@ -35,21 +49,8 @@ void uart_init(void)
     UCSRB |= (1<<TXEN);     //enable UART TX
     UCSRC = (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0);   // asynchronous 8N1
     UCSRB |= (1<<RXEN);     //enable UART RX
-}
 
-uint8_t uart_getc(void) {
-    while (!(UCSRA & (1<<RXC)))
-    {
-    }
-    return UDR;
-}
-
-void uart_putc(unsigned char c)
-{
-    while (!(UCSRA & (1<<UDRE)))
-    {
-    }
-    UDR = c;
+    stdout = &uart_output;
 }
 
 //Fan control routines

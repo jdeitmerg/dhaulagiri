@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <stdio.h>
 
 /*definitions common to all modules
  */

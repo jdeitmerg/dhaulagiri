@@ -115,7 +115,7 @@ ISR(TIMER1_COMPA_vect)
  *downscaled interval
  */
 {
-    //loop thugh all timers
+    //loop through all timers
     uint8_t i = 0;
     while(timers[i].funcptr != 0)
     {
