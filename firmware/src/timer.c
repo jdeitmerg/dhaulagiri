@@ -6,7 +6,7 @@ timer timers[10];   //Note: you can only register a maximum of 9 timers!
 void timer_init(void)
 {
     //We use timer1 in CTC (clear timer to zero when counter matches OCR1A)
-    TCCR1B = (1<<WGM13) | (1<<WGM12);
+    TCCR1B = (0<<WGM13) | (1<<WGM12);
     TCCR1A = (0<<WGM11) | (0<<WGM10);
     //timer1 Output Compare A Match Interrupt Enable
     TIMSK |= 1<<OCIE1A;
