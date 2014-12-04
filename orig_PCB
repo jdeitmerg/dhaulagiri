@@ -22,7 +22,7 @@ Pinout
   9     PORTA.0/AN0/SDA some circuitry -> CN2
   10    PORTA.1/AN1     CN3.3
   11    PORTB.2/AN6     CN1.1
-  12    PORTB.2/AN6     CN1.3
+  12    PORTB.3/AN7     CN1.3
   13    VDD             VCC
   14    OSCI/SCK        Oscillator
   15    OSCO/PORTC.0    Oscrillator
@@ -67,3 +67,8 @@ Water Sensor Connector 'CN3'
 
 Humidity Sensor Connector 'CN1'
 ===============================
+1   PORTB.2/AN6
+2   VCC
+3   PORTB.3/AN7
+4   PORTC.1/Vref
+5   PORTD.0

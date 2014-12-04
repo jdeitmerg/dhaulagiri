@@ -56,7 +56,8 @@ Conclusions
 
 3)  Powering all 8 7seg elements at the same time is a little risky, as the
     combined current would be around 65mA, which is above the maximum rating
-    of current through VCC or GND.
-    When continuously cycling through LEDs, KEYs, DIS0 and DIS1, the maximum
-    rating would only be exceeded < 50% of the time, so we don't need to worry
-    too much. (Test pending)
+    of current through VCC or GND (50mA).
+    When continuously cycling through LEDs, DIS0, DIS1 (and KEYs, but the KEY
+    cycle is going to be much shorter), the maximum rating would only be
+    exceeded maximally ~65% of the time, so we don't need to worry
+    too much. This is tested, works well.
