@@ -42,9 +42,13 @@
 #define LED_WATER   0x04
 #define LED_CONT    0x08
 
+//Four switches on the IO panel:
+#define SW_ONOFF    0x01
+#define SW_DOWN     0x02
+#define SW_UP       0x04
+#define SW_CONT     0x08
+
 void io_init(void);
 void io_set_LEDs(uint8_t state);
-void io_test(void);
-void disp_pulse(void);
 
 #endif

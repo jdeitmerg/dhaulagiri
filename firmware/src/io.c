@@ -4,9 +4,9 @@
 #include "timer.h"
 
 //State of outputs
-uint8_t LEDs_state;
-uint8_t DIS0_state;
-uint8_t DIS1_state;
+uint8_t LEDs_state = 0xFF;
+uint8_t DIS0_state = 0xFF;
+uint8_t DIS1_state = 0xFF;
 
 
 //Bitpatterns for 7 segment digits
@@ -53,6 +53,33 @@ uint8_t dis_letters[] = {
     ~0x5B   //'Z' like '2'
 };
 
+uint8_t dischar(char letter)
+/*Return 7 segment state of any of the characters we have defined above
+ */
+{
+    if(letter >= 'a' && letter <= 'z')
+    {
+        //convert to upper
+        letter -= 'a'-'A';
+    }
+    if(letter >= 'A' && letter <= 'Z')
+    {
+        return dis_letters[letter-'A'];
+    }
+    else if (letter >= '0' && letter <= '9')
+    {
+        return dis_digits[letter-'0'];
+    }
+    else
+    {
+        return (uint8_t)~0x00;
+    }
+}
+
+inline uint8_t disdigit(uint8_t digit)
+{
+    return dis_digits[digit];
+}
 
 /*There's a transistor between the AVR pin and the LEDC pin, so our signal
  *get's inverted.
@@ -107,24 +134,6 @@ inline void toggle_DIS1()
     togglebit(PORT_IODIS1, PIODIS1);
 }
 
-void io_init(void)
-{
-    setbit(DDR_IOCLK, DDIOCLK);     //output
-    setbit(DDR_IODAT, DDIODAT);     //output
-    clearbit(DDR_IOKEY, DDIOKEY);   //input
-    setbit(DDR_IOLED, DDIOLED);     //output
-    setbit(DDR_IODIS0, DDIODIS0);   //output
-    setbit(DDR_IODIS1, DDIODIS1);   //output
-
-    clearbit(PORT_IOCLK, PIOCLK);   //low by default
-
-    clear_LEDC();
-    clear_DIS0();
-    clear_DIS1();
-
-    register_timer(&disp_pulse, 1024);
-}
-
 inline void pulse_ioclk()
 {
     //short pulse on CLK, "clocking occurs on the low-to-high-level transition"
@@ -168,9 +177,67 @@ void shiftr_setval(uint8_t value)
     }
 }
 
-//timer 0 overflow interrupt routine
-//ISR(TIMER0_OVF_vect)
-void disp_pulse(void)
+uint8_t io_switches_raw(void)
+/*Test the switches SW1 to SW4 and returns ored states*/
+{
+    clear_LEDC();
+    clear_DIS0();
+    clear_DIS1();
+    uint8_t i, state = 0;
+    for(i = 0; i < 4; ++i)
+    {
+        shiftr_setval(~(1<<i));    //SW1, ..., SW4
+        state |= testbit(~PIN_IOKEY, PIOKEY) << i;
+    }
+    return(state);
+}
+
+inline void switch_handler(void)
+{
+    //we don't need to do this very often
+    //Maybe we could share this time slot with the LEDs then...
+    static uint8_t delay_counter = 0;
+    if(++delay_counter < 5)
+    {
+        return;
+    }
+    //else
+    delay_counter = 0;
+
+    static uint8_t old_state;   //For checking whether switches were pressed
+                                //before
+
+    //For now, we'll just have all the buttons increment a digit on DIS0.
+    static uint8_t countup = 0;
+
+    uint8_t new_state;
+    new_state = io_switches_raw();
+    //only do something when the switch wasn't pressed before
+    uint8_t switches = (old_state ^ new_state) & new_state;
+    old_state = new_state;
+    if(switches & SW_ONOFF)
+    {
+        DIS0_state = disdigit(countup++ %10);
+    }
+    if(switches & SW_DOWN)
+    {
+        DIS0_state = disdigit(countup++ %10);
+    }
+    if(switches & SW_UP)
+    {
+        DIS0_state = disdigit(countup++ %10);
+    }
+    if(switches & SW_CONT)
+    {
+        DIS0_state = disdigit(countup++ %10);
+    }
+}
+
+void disp_cycle(void)
+/*This routine is responsible for cycling through the different outputs, as we
+ *can only do output on one of {LEDs, DIS0, DIS1} or input of the switches at
+ *the same time.
+ */
 {
     static volatile uint8_t curr_state;  //current state
 
@@ -193,69 +260,22 @@ void disp_pulse(void)
             shiftr_setval(DIS1_state);
             set_DIS1();
             break;
+        case 3:
+            switch_handler();
+            break;
     }
 
-    if(++curr_state == 3)
+    if(++curr_state == 4)
     {
         curr_state = 0;
     }
-}
-
-uint8_t io_switches_raw(void)
-/*Test the switches SW1 to SW4 and returns ored states*/
-{
-    clear_LEDC();
-    clear_DIS0();
-    clear_DIS1();
-    uint8_t i, state = 0;
-    for(i = 0; i < 4; ++i)
-    {
-        shiftr_setval(1<<i);    //SW1, ..., SW4
-        _delay_loop_1(10);
-        state |= testbit(PIN_IOKEY, PIOKEY) << i;
-    }
-    return(state);
 }
 
 void io_set_LEDs(uint8_t state)
 /*Set the LEDs according to the given state (probably ored LED_*)
  */
 {
-    clear_DIS0();
-    clear_DIS1();
-
-    //It's save to power all LEDs at the same time (see file io_panel_PCB)
-    clear_LEDC();
-    shiftr_setval(~state);
-    set_LEDC();
-}
-
-uint8_t dischar(char letter)
-/*Return 7 segment state of any of the characters we have defined above
- */
-{
-    if(letter >= 'a' && letter <= 'z')
-    {
-        //convert to upper
-        letter -= 'a'-'A';
-    }
-    if(letter >= 'A' && letter <= 'Z')
-    {
-        return dis_letters[letter-'A'];
-    }
-    else if (letter >= '0' && letter <= '9')
-    {
-        return dis_digits[letter-'0'];
-    }
-    else
-    {
-        return (uint8_t)~0x00;
-    }
-}
-
-inline uint8_t disdigit(uint8_t digit)
-{
-    return dis_digits[digit];
+    LEDs_state = state;
 }
 
 void ticker_pr(char str[])
@@ -284,10 +304,20 @@ void ticker_pr(char str[])
     _delay_ms(500);
 }
 
-void io_test(void)
+void io_init(void)
 {
-    while(1)
-    {
-        ticker_pr("abcdefghijklmnopqrstuvwxyz0123456789");
-    }
+    setbit(DDR_IOCLK, DDIOCLK);     //output
+    setbit(DDR_IODAT, DDIODAT);     //output
+    clearbit(DDR_IOKEY, DDIOKEY);   //input
+    setbit(DDR_IOLED, DDIOLED);     //output
+    setbit(DDR_IODIS0, DDIODIS0);   //output
+    setbit(DDR_IODIS1, DDIODIS1);   //output
+
+    clearbit(PORT_IOCLK, PIOCLK);   //low by default
+
+    clear_LEDC();
+    clear_DIS0();
+    clear_DIS1();
+
+    register_timer(&disp_cycle, 1024);
 }
