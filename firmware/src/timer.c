@@ -13,18 +13,23 @@ void timer_init(void)
     TIMSK |= 1<<OCIE1A;
 }
 
-void register_timer(void (*fptr)(void), uint32_t ival)
+int8_t register_timer(void (*fptr)(void), uint32_t ival)
 /*Register a function which is to be called every $inval cpu cycles. To get
  *good performance, these intervals should all be powers of two (It should
  *also work well with non power of two values, but for some reason it doesn't).
- *Note that right now this doesn't return a value, so you don't know whether
- *registering your timer worked. Also note there is no way to stop your
- *function from being called yet.
+ *Note there is no way to stop your function from being called yet.
+ *
+ *Return values:
+ *  0   everything is fine
+ *  -1  MAX_TIMERS reached.
+ *  -2  Reguested interval doesn't fit the resolution. If you want to register
+ *      different timers with a big interval range, please make sure they have
+ *      common divisors that are powers of two.
  */
 {
     if (num_timers == MAX_TIMERS)
     {
-        return;
+        return -1;
     }
 
     timers[num_timers].funcptr = fptr;
@@ -33,7 +38,7 @@ void register_timer(void (*fptr)(void), uint32_t ival)
 
 
     uint8_t i;
-    uint32_t smallest = 0xFFFFFFFF; //smallest interval
+    uint32_t smallest = UINT32_MAX; //smallest interval
 
     //loop through all registered timers to find smallest intervals
     for(i = 0; i < num_timers; i++)
@@ -108,6 +113,17 @@ void register_timer(void (*fptr)(void), uint32_t ival)
         clk_sel = (0<<CS12) | (0<<CS11) | (1<<CS10);
     }
 
+    /*Before we really do anything, check whether we cover the whole range
+     *of registered intervals with that prescaler
+     */
+    if(gcd/presc > UINT16_MAX)
+    {
+        //Looks like we can't fit in the new timer...
+        num_timers--;
+        return -2;
+    }
+    //else
+
     //Now that we have the clock prescaler, scale all the timers down
     for (i = 0; i < num_timers; i++)
     {
@@ -121,6 +137,8 @@ void register_timer(void (*fptr)(void), uint32_t ival)
     //Let's get the timer running!
     TCCR1B = (TCCR1B & ((1<<ICNC1) | (1<<ICES1) | (1<<WGM13) | (1<<WGM12)))
              | clk_sel;
+
+    return 0;
 }
 
 ISR(TIMER1_COMPA_vect)

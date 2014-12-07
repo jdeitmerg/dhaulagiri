@@ -76,6 +76,10 @@ uint8_t dischar(char letter)
     }
 }
 
+/*In case we need a size reduction: making these inline functions static
+ *frees up more than 500 bytes.
+ */
+
 inline uint8_t disdigit(uint8_t digit)
 {
     return dis_digits[digit];
@@ -177,12 +181,10 @@ void shiftr_setval(uint8_t value)
     }
 }
 
-uint8_t io_switches_raw(void)
+inline uint8_t io_switches_raw(void)
 /*Test the switches SW1 to SW4 and returns ored states*/
 {
-    clear_LEDC();
-    clear_DIS0();
-    clear_DIS1();
+    //we don't need to clear LEDC, DIS0, DIS1, disp_cycle just did that.
     uint8_t i, state = 0;
     for(i = 0; i < 4; ++i)
     {

@@ -8,4 +8,4 @@ typedef struct {
 } timer;
 
 void timer_init(void);
-void register_timer(void (*fptr)(void), uint32_t ival);
+int8_t register_timer(void (*fptr)(void), uint32_t ival);
