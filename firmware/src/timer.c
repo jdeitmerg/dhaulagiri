@@ -1,8 +1,10 @@
 #include "common.h"
 #include "timer.h"
 
-timer timers[MAX_TIMERS];
-uint8_t num_timers = 0;
+//Linked list of registered timers
+timer* list_head;   //pointer to first timer in linked list
+timer last_timer;   //additional timer at the end of list, used to
+                    //'run into' while looping over the list.
 
 void timer_init(void)
 {
@@ -10,7 +12,43 @@ void timer_init(void)
     TCCR1B = (0<<WGM13) | (1<<WGM12);
     TCCR1A = (0<<WGM11) | (0<<WGM10);
     //timer1 Output Compare A Match Interrupt Enable
-    TIMSK |= 1<<OCIE1A;
+    setbit(TIMSK, OCIE1A);
+}
+
+int8_t find_free_id()
+/*Get an id that is not yet in the linked list.
+ *This is a brute force solution, it's not very fast. That's okay as long as
+ *it's not used that often...
+ */
+{
+    timer* t;
+    int8_t id = 1;
+    uint8_t found;
+
+    if(list_head == NULL)   //list is empty
+    {
+        return 0;
+    }
+
+    while(1)    //we just assume there are less than 127 timers.
+    {
+        t = list_head;
+        found = 0;
+        while(t->next != NULL)
+        {
+            if(t->id == id)
+            {
+                found = 1;
+                break;
+            }
+            t = t->next;
+        }
+        if(found == 0)
+        {
+            return id;
+        }
+        id++;
+    }
 }
 
 int8_t register_timer(void (*fptr)(void), uint32_t ival)
@@ -20,33 +58,61 @@ int8_t register_timer(void (*fptr)(void), uint32_t ival)
  *Note there is no way to stop your function from being called yet.
  *
  *Return values:
- *  0   everything is fine
- *  -1  MAX_TIMERS reached.
- *  -2  Reguested interval doesn't fit the resolution. If you want to register
- *      different timers with a big interval range, please make sure they have
- *      common divisors that are powers of two.
+ *  0-127   id of sucessfully configured new timer. Needed to deregister later.
+ *  -1      malloc failed.
+ *  -2      Reguested interval doesn't fit the resolution. If you want to
+ *          register different timers with a big interval range, please make
+ *          sure they have common divisors that are powers of two.
  */
+
+/*size before making this dynamic:
+    text    data     bss     dec     hex
+    2462      54     151    2667     a6b
+ *size after making this dynamic:
+    text      data    bss    dec     hex
+    3106       60      33    3199     c7f
+ */
+
 {
-    if (num_timers == MAX_TIMERS)
+    timer* i;
+    uint32_t smallest = UINT32_MAX; //smallest interval
+    timer* new_timer = malloc(sizeof(timer));
+
+    if (new_timer == NULL)
     {
         return -1;
     }
+    //else
 
-    timers[num_timers].funcptr = fptr;
-    timers[num_timers].interval = ival;
-    num_timers++;
-
-
-    uint8_t i;
-    uint32_t smallest = UINT32_MAX; //smallest interval
+    new_timer->interval = ival;
+    new_timer->funcptr = fptr;
+    new_timer->next = &last_timer;
+    new_timer-> id = find_free_id();
+    if(list_head == NULL)   //First element in the list
+    {
+        list_head = new_timer;
+    }
+    else
+    {
+        //we don't have a list tail pointer, as that makes removing too
+        //complicated, so we have to loop to find the last one.
+        i = list_head;
+        while(i->next != &last_timer);
+        {
+            i = i->next;
+        }
+        i->next = new_timer;
+    }
 
     //loop through all registered timers to find smallest intervals
-    for(i = 0; i < num_timers; i++)
+    i = list_head;
+    while(i->next != NULL)
     {
-        if(timers[i].interval < smallest)
+        if(i->interval < smallest)
         {
-            smallest = timers[i].interval;
+            smallest = i->interval;
         }
+        i = i->next;
     }
 
 
@@ -56,23 +122,25 @@ int8_t register_timer(void (*fptr)(void), uint32_t ival)
      */
     uint32_t j = 1;
     uint32_t gcd;
-    uint8_t found = 0;
+    uint8_t found;
     while(1)
     {
         if(smallest%j == 0)
         {
             gcd = smallest/j;
             /*loop through all intervals and see if they're dividable by
-             *divisor
+             *the gcd we just choose
              */
             found = 1;
-            for(i = 0; i < num_timers; i++)
+            i = list_head;
+            while(i->next != NULL)
             {
-                if(timers[i].interval%gcd != 0)
+                if(i->interval%gcd != 0)
                 {
                     found = 0;
                     break;
                 }
+                i = i->next;
             }
             //Check if we broke. If not, we found our gcd!
             if(found)
@@ -118,17 +186,18 @@ int8_t register_timer(void (*fptr)(void), uint32_t ival)
      */
     if(gcd/presc > UINT16_MAX)
     {
-        //Looks like we can't fit in the new timer...
-        num_timers--;
+        deregister_timer(new_timer->id);
         return -2;
     }
     //else
 
     //Now that we have the clock prescaler, scale all the timers down
-    for (i = 0; i < num_timers; i++)
+    i = list_head;
+    while(i->next != NULL)
     {
-        timers[i].downscaled = timers[i].interval/presc;
-        timers[i].countdown = timers[i].downscaled;
+        i->downscaled = i->interval/presc;
+        i->countdown = i->downscaled;
+        i = i->next;
     }
 
 
@@ -138,7 +207,36 @@ int8_t register_timer(void (*fptr)(void), uint32_t ival)
     TCCR1B = (TCCR1B & ((1<<ICNC1) | (1<<ICES1) | (1<<WGM13) | (1<<WGM12)))
              | clk_sel;
 
-    return 0;
+    return new_timer->id;
+}
+
+void deregister_timer(int8_t id)
+{
+    timer* t;
+    timer* prev;
+
+    t = list_head;
+
+    while(t->next != NULL)
+    {
+        if(t->id == id)
+        {
+            if(t == list_head)  //we have to catch the first element
+            {
+                list_head = t->next;
+            }
+            else
+            {
+                //Won't initialize prev, that'd cost us 2 bytes...
+                prev->next = t->next;
+            }
+            free(t);
+            //TODO: we might recalculate our timer prescaler now...
+            return;
+        }
+        prev = t;
+        t = t->next;
+    }
 }
 
 ISR(TIMER1_COMPA_vect)
@@ -150,13 +248,15 @@ ISR(TIMER1_COMPA_vect)
  */
 {
     //loop through all timers
-    uint8_t i;
-    for(i = 0; i < num_timers; i++)
+    timer* i;
+    i = list_head;
+    while(i->next != NULL)
     {
-        if(--timers[i].countdown == 0)
+        if(--(i->countdown) == 0)
         {
-            timers[i].funcptr();
-            timers[i].countdown = timers[i].downscaled;
+            i->funcptr();
+            i->countdown = i->downscaled;
         }
+        i = i->next;
     }
 }
