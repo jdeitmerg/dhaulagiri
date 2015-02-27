@@ -213,7 +213,8 @@ int8_t register_timer(void (*fptr)(void), uint32_t ival)
 void deregister_timer(int8_t id)
 {
     timer* t;
-    timer* prev;
+    timer* prev = NULL; //this initialization costs 4 bytes of rom, but at
+                        //least we don't get 'not initialized' warnings.
 
     t = list_head;
 
@@ -227,7 +228,6 @@ void deregister_timer(int8_t id)
             }
             else
             {
-                //Won't initialize prev, that'd cost us 2 bytes...
                 prev->next = t->next;
             }
             free(t);

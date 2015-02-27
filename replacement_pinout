@@ -2,20 +2,20 @@ OrigPin AVRPin          Connected to
 1        PD2            CN6.CLK
 2        PC5            CN6.DAT + IC4.SDA
 3        PC4            CN6.KEY
-4        PC3            transistor -> CN6.LEDC
+4        PD6            transistor -> CN6.LEDC
 5        PB6            CN6.DIS0
 6        PB7            CN6.DIS1
-7                       some circuitry -> CN2
-8                       GND
-9                       some circuitry -> CN2
-10       PB0            CN3.3
-11                      CN1.1
-12                      CN1.3
-13                      VCC
+7                       reset circuit
+8        [GND]          GND
+9        PC1            CN2.2 [cooling unit temperature]
+10       PB0            CN3.3 [water full]
+11       PC3            CN1.1 -> ambient temperature PT
+12       PC2            CN1.3 -> humidity sensor capacitor
+13       [VCC]          VCC
 14                      Oscillator
 15                      Oscsillator
-16                      CN1.4
-17                      CN1.5
+16                      CN1.4 [used for humidity sensor, not connected]
+17       [GND]          CN1.5 [used for humidity sensor, connect to GND]
 18       PC0            transistor -> relay -> FAN_H
 19       PD4            transistor -> relay -> compressor
 20       PD3            IC4.SCL

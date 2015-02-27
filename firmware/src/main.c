@@ -21,12 +21,42 @@
 #define DDR_COMP    DDRD
 #define DDCOMP      DDD4
 
+/*ambient temperature sensor
+ */
+#define PORT_ATS    PORTC
+#define PATS        PC3
+#define DDR_ATS     DDRC
+#define DDATS       DDC3
+
+/*humidity sensor
+ */
+#define PORT_HUM    PORTC
+#define PHUM        PC2
+#define DDR_HUM     DDRC
+#define DDHUM       DDC2
+
+/*cooling unit temperature sensor
+ */
+#define PORT_CTS    PORTC
+#define PCTS        PC1
+#define DDR_CTS     DDRC
+#define DDCTS       DDC1
+
+/*water full sensor
+ */
+#define PORT_FULL   PORTB
+#define PFULL       PB0
+#define DDR_FULL    DDRB
+#define DDFULL      DDB0
+
 
 //Like the glibc example
 int uart_putchar(char c, FILE* stream)
 {
     if (c == '\n')
-    uart_putchar('\r', stream);
+    {
+        uart_putchar('\r', stream);
+    }
     loop_until_bit_is_set(UCSRA, UDRE);
     UDR = c;
     return 0;
@@ -105,6 +135,5 @@ int main(void)
 
     while(1)
     {
-
     }
 }

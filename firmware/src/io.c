@@ -284,8 +284,6 @@ void ticker_pr(char str[])
 /*Dispaly the supplied string on the two 7 segments once. Blocking!
  */
 {
-    //We give only 3ms to the delay func, but the actual delay is much longer
-
     uint8_t sp0 = 1;
     uint8_t sp1 = 0;
     //At first, display only first char on right 7 segment

@@ -22,10 +22,10 @@
 #define DDR_IOKEY   DDRC
 #define DDIOKEY     DDC4
 //LEDC:
-#define PORT_IOLED  PORTC
-#define PIOLED      PC3
-#define DDR_IOLED   DDRC
-#define DDIOLED     DDC3
+#define PORT_IOLED  PORTD
+#define PIOLED      PD6
+#define DDR_IOLED   DDRD
+#define DDIOLED     DDD6
 //DIS0:
 #define PORT_IODIS0 PORTB
 #define PIODIS0     PB6
