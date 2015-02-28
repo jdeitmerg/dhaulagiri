@@ -1,6 +1,7 @@
 #include "common.h"
 #include <util/delay_basic.h>
 #include "timer.h"
+#include "io.h"
 
 //State of outputs
 uint8_t LEDs_state = 0xFF;
