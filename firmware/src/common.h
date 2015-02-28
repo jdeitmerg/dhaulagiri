@@ -2,10 +2,8 @@
 #define COMMON_H
 
 #define F_CPU 1000000UL
-#define BAUD 2400UL
 
 #include <util/delay.h>
-#include <util/setbaud.h>
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
