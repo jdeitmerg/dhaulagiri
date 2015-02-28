@@ -1,6 +1,5 @@
-#include <util/delay_basic.h>
 #include "common.h"
-#include "io.h"
+#include <util/delay_basic.h>
 #include "timer.h"
 
 //State of outputs

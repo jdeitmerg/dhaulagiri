@@ -1,3 +1,6 @@
+#ifndef TIMER_H
+#define TIMER_H
+
 typedef struct Timer{
     void (*funcptr)(void);
     uint32_t interval;
@@ -10,3 +13,5 @@ typedef struct Timer{
 void timer_init(void);
 int8_t register_timer(void (*fptr)(void), uint32_t ival);
 void deregister_timer(int8_t id);
+
+#endif

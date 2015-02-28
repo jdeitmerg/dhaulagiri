@@ -1,8 +1,6 @@
 #ifndef IO_H
 #define IO_H
 
-#include <avr/io.h>
-
 /*input/output panel connections
  */
 //CLK: 
