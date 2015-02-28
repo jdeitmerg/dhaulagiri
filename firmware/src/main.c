@@ -62,8 +62,13 @@ int uart_putchar(char c, FILE* stream)
     return 0;
 }
 
-static FILE uart_output = FDEV_SETUP_STREAM(uart_putchar, NULL,
-                                            _FDEV_SETUP_WRITE);
+int uart_getchar(FILE *stream) {
+    loop_until_bit_is_set(UCSRA, RXC);
+    return UDR;
+}
+
+static FILE uart_stream = FDEV_SETUP_STREAM(uart_putchar, uart_getchar,
+                                             _FDEV_SETUP_RW);
 
 void uart_init(void)
 {
@@ -80,7 +85,8 @@ void uart_init(void)
     UCSRC = (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0);   // asynchronous 8N1
     UCSRB |= (1<<RXEN);     //enable UART RX
 
-    stdout = &uart_output;
+    stdout = &uart_stream;
+    stdin = &uart_stream;
 }
 
 //Fan control routines
