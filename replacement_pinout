@@ -2,7 +2,7 @@ OrigPin AVRPin          Connected to
 1        PD2            CN6.CLK
 2        PC5            CN6.DAT + IC4.SDA
 3        PC4            CN6.KEY
-4        PD6            transistor -> CN6.LEDC
+4        PD7            transistor -> CN6.LEDC
 5        PB6            CN6.DIS0
 6        PB7            CN6.DIS1
 7                       reset circuit
@@ -19,3 +19,9 @@ OrigPin AVRPin          Connected to
 18       PC0            transistor -> relay -> FAN_H
 19       PD4            transistor -> relay -> compressor
 20       PD3            IC4.SCL
+
+Additional AVR Connections
+--------------------------
+PD6 (AIN0)		voltage divider ~4.1 V
+PD0 (RXD)		uart input
+PD1 (TXD)		voltage divider -> uart output (3.3V)
