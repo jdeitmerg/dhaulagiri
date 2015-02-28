@@ -47,11 +47,12 @@
 #define DDR_FULL    DDRB
 #define DDFULL      DDB0
 
-
+void control_init();
 //Fan control routines
 void start_fan(void);
 void stop_fan(void);
 void toggle_fan(void);
+//Compressor control routines
 void start_comp(void);
 void stop_comp(void);
 void toggle_comp(void);

@@ -1,6 +1,12 @@
 #include "common.h"
 #include "control.h"
 
+void control_init()
+{
+	setbit(DDR_FAN, DDFAN);
+    setbit(DDR_COMP, DDCOMP);
+}
+
 //Fan control routines
 void start_fan(void)
 {
