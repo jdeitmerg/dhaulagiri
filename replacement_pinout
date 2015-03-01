@@ -22,6 +22,6 @@ OrigPin AVRPin          Connected to
 
 Additional AVR Connections
 --------------------------
-PD6 (AIN0)		voltage divider ~4.1 V
-PD0 (RXD)		uart input
-PD1 (TXD)		voltage divider -> uart output (3.3V)
+PD6 (AIN0)      voltage divider ~4.1 V
+PD0 (RXD)       uart input
+PD1 (TXD)       voltage divider -> uart output (3.3V)
