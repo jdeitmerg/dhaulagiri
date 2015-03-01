@@ -6,11 +6,20 @@ void control_init()
 	setbit(DDR_FAN, DDFAN);
     setbit(DDR_COMP, DDCOMP);
     //set the analog comparator AIN0 (PD6) to input. Should be around 4.1V
-    clearbit(DDRD, DDD6);
-    //select negative input of analog comparator from ADC multiplexer
+    //clearbit(DDRD, DDD6); //just leave it there, shouldn't be set in the
+                            //first place
+
+    //select AVCC as ADC Reference
+    setbit(ADMUX, REFS0);
+    //left adjust ADC results
+    setbit(ADMUX, ADLAR);
+    //50 - 200 kHz needed, 1MHz provided -> prescaler: 16 -> 62.5kHz
+    clearbit(ADCSRA, ADPS0);
+    clearbit(ADCSRA, ADPS1);
+    setbit(ADCSRA, ADPS2);
 }
 
-uint32_t read_humidity(void)
+uint32_t humidity(void)
 {
 	uint32_t counter = 0;
 	/*discharge capacitor
@@ -47,6 +56,25 @@ uint32_t read_humidity(void)
 			return 0;
 		counter++;
 	}
+}
+
+uint8_t ambient_temp(void)
+{
+	//select ADC3 from muxer
+	setbit(ADMUX, MUX0);
+	setbit(ADMUX, MUX1);
+	clearbit(ADMUX, MUX2);
+	clearbit(ADMUX, MUX3);
+
+	//enable ADC
+	setbit(ADCSRA, ADEN);
+	//start ADC conversion
+	setbit(ADCSRA, ADSC);
+	//wait for conversion to finish
+	loop_until_bit_is_set(ADCSRA, ADIF);
+	//datasheet: "ADIF is cleared by writing a logical one to the flag"
+	setbit(ADCSRA, ADIF);
+	return(ADCH);
 }
 
 //Fan control routines

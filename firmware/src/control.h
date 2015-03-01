@@ -48,7 +48,8 @@
 #define DDFULL      DDB0
 
 void control_init();
-uint32_t read_humidity(void);
+uint32_t humidity(void);
+uint8_t ambient_temp(void);
 //Fan control routines
 void start_fan(void);
 void stop_fan(void);

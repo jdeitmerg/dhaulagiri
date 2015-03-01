@@ -25,7 +25,8 @@ int main(void)
 
     while(1)
     {
-        printf("%lu\n", read_humidity());
+        //printf("%lu\n", humidity());
+        printf("%u\n", ambient_temp());
         _delay_ms(300);
     }
 }
