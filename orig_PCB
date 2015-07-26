@@ -85,3 +85,28 @@ Pinout (top to bottom)
 4   PORTC.1/Vref  not needed
 5   PORTD.0       use unclear, connect to GND for simple rise-time measure-
                       ments
+
+Measurement circuit:
+
+                o  Vcc = 5V (The direct connection to Vcc is the only
+                |            modification of the original hardware.)
+               .-.
+               | |47k
+               | |
+               '-'
+                |     ___
+                o----|___|------o PORT C.2
+                |      1k         Discharge + measure
+                |
+               ---
+               ---  C_Sense
+                |
+                # GND
+
+(created by AACircuit v1.28.6 beta 04/19/05 www.tech-chat.de)
+
+C_Sense ranges from ~3nF (dry) to 120nF (humid).
+With the charging resistor of ~47k, we get a time constant of
+.15ms to 5.5ms. At 1MHz that's 150 to 6500 cylces. When discharging (C.2 low),
+the maximum time constant is .1ms (100 cycles).
+
