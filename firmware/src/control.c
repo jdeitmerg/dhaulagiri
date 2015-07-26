@@ -29,9 +29,9 @@ uint32_t humidity(void)
     clearbit(PORT_HUM, PHUM);
     //the time this takes should be around 3*120nF*1000R = 360us
     _delay_ms(100);
-    //set to input with pullup
+    //set to input without pullup
     clearbit(DDR_HUM, DDHUM);
-    setbit(PORT_HUM, PHUM);
+    clearbit(PORT_HUM, PHUM);
 
     //recharge starts immediately, connect PHUM to analog comparator (AC)
     setbit(SFIOR, ACME);    //enable multiplexer for AC
