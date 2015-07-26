@@ -15,9 +15,9 @@ compile: $(SRC_DIR)/main.c $(SRC_DIR)/io.c $(SRC_DIR)/io.h $(SRC_DIR)/common.h $
 	$(CC) $(CC_ARGS) -mmcu=$(MMCU) -o $(BUILD_DIR)/main $(SRC_DIR)/main.c $(SRC_DIR)/io.c $(SRC_DIR)/timer.c $(SRC_DIR)/uart.c $(SRC_DIR)/control.c
 
 burn: compile
-	sudo avrdude -p m8 -c $(PG_TYPE) -P $(PG_PORT) -U flash:w:$(BUILD_DIR)/main
+	avrdude -p m8 -c $(PG_TYPE) -P $(PG_PORT) -U flash:w:$(BUILD_DIR)/main
 
 check:
-	sudo avrdude -p m8 -c $(PG_TYPE) -P $(PG_PORT)
+	avrdude -p m8 -c $(PG_TYPE) -P $(PG_PORT)
 
 all: compile
