@@ -22,11 +22,11 @@ void init(void) {
 int main(void)
 {
     init();
-
     while(1)
     {
         //printf("%lu\n", humidity());
-        printf("%u\n", ambient_temp());
+        printf("\namb: %u deg C\tunit:%u deg C", temp_measure(ambient),
+               temp_measure(cool_unit));
         _delay_ms(300);
     }
 }
