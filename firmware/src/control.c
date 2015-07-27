@@ -91,42 +91,6 @@ static uint8_t temp_celsius(enum temp_sensor sensor, uint8_t rawval)
     return((uint8_t) result);
 }
 
-uint32_t humidity(void)
-{
-    uint32_t counter = 0;
-    /*discharge capacitor
-     */
-    //set pin as output, low, to discharge
-    setbit(DDR_HUM, DDHUM);
-    clearbit(PORT_HUM, PHUM);
-    //the time this takes should be around 3*120nF*1000R = 360us
-    _delay_ms(100);
-    //set to input without pullup
-    clearbit(DDR_HUM, DDHUM);
-    clearbit(PORT_HUM, PHUM);
-
-    //recharge starts immediately, connect PHUM to analog comparator (AC)
-    setbit(SFIOR, ACME);    //enable multiplexer for AC
-    //select PHUM (ADC2)
-    mux_select_ch(2);
-
-    //wait until AC triggers
-    while(1)
-    {
-        //_delay_us(500);
-        //positive input (AIN0) is ~4.1V we're waiting for the increasing
-        //capacitor voltage to cross that. So we're waiting for ACO to be
-        //cleared
-        if(!testbit(ACSR, ACO))
-        {
-            return(counter);
-        }
-        if(counter == UINT32_MAX)
-            return 0;
-        counter++;
-    }
-}
-
 uint8_t temp_measure(enum temp_sensor sensor)
 {
     //ambient first, cooling unit second

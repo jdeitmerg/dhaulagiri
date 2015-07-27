@@ -81,32 +81,35 @@ Pinout (top to bottom)
 ----------------------
 1   PORTB.2/AN6   100k:100k voltage divider to NTC (ambient temperature)
 2   VCC
-3   PORTB.3/AN7   discharge humidity sensor capacitor/measure rise-time
-4   PORTC.1/Vref  not needed
-5   PORTD.0       use unclear, connect to GND for simple rise-time measure-
-                      ments
+3   PORTB.3/AN7   V_HUM
+4   PORTC.1/Vref  Supply +
+5   PORTD.0       Supply -
 
 Measurement circuit:
 
-                o  Vcc = 5V (The direct connection to Vcc is the only
-                |            modification of the original hardware.)
-               .-.
-               | |47k
-               | |
-               '-'
-                |     ___
-                o----|___|------o PORT C.2
-                |      1k         Discharge + measure
-                |
-               ---
-               ---  C_Sense
-                |
-                # GND
+      .---------------------o----o Vcc
+      |                     |
+     .-.                   .-.
+  47k| |                   | |
+     | |                   | |47k
+     '-' 47k      R_HUM    '-'
+      |  ___       ___      |
+      o-|___|--o--|___|--o--'
+      |        |         |
+      |        |         |
+      o        o         o
+  Supply +   V_HUM      Supply -
 
 (created by AACircuit v1.28.6 beta 04/19/05 www.tech-chat.de)
 
-C_Sense ranges from ~3nF (dry) to 120nF (humid).
-With the charging resistor of ~47k, we get a time constant of
-.15ms to 5.5ms. At 1MHz that's 150 to 6500 cylces. When discharging (C.2 low),
-the maximum time constant is .1ms (100 cycles).
+If R_HUM really is a UPS-500 (resistive relative humidity sensor), its impe-
+dance ranges from below 5kOhm to above 30MOhm. According to the UPS-500
+application notes, only symmetrical AC voltages may be applied to the sensor
+(smaller than 6V and between 33 and 1000 Hz). To do so, invert Supply +/-
+Voltages ~2000 times per second (1kHz square wave). For calculating the RMS
+of the Voltage across R_HUM we have to consider the alternating ground of the
+circuit: When Supply + is Vcc (and Supply - is GND), measure V_HUM as the
+voltage across R_HUM, when Supply is inverted, measure V_HUM-Vcc as the voltage
+across R_HUM. Small optimization: Values are squared for RMS anyways, calcu-
+late Vcc-V_HUM instead to keep all values unsigned.
 

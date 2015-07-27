@@ -54,7 +54,6 @@ enum temp_sensor
 };
 
 void control_init();
-uint32_t humidity(void);
 uint8_t temp_measure(enum temp_sensor);
 //Fan control routines
 void start_fan(void);
