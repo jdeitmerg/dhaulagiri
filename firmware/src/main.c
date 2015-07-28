@@ -22,10 +22,11 @@ void init(void) {
 int main(void)
 {
     init();
+    excitation_start();
     while(1)
     {
-        printf("\namb: %u deg C\tunit:%u deg C", temp_measure(ambient),
-               temp_measure(cool_unit));
-        _delay_ms(300);
+        //printf("\namb: %u deg C\tunit:%u deg C", temp_measure(ambient),
+        //       temp_measure(cool_unit));
+        //_delay_ms(300);
     }
 }

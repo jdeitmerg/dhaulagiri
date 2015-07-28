@@ -106,10 +106,17 @@ If R_HUM really is a UPS-500 (resistive relative humidity sensor), its impe-
 dance ranges from below 5kOhm to above 30MOhm. According to the UPS-500
 application notes, only symmetrical AC voltages may be applied to the sensor
 (smaller than 6V and between 33 and 1000 Hz). To do so, invert Supply +/-
-Voltages ~2000 times per second (1kHz square wave). For calculating the RMS
-of the Voltage across R_HUM we have to consider the alternating ground of the
-circuit: When Supply + is Vcc (and Supply - is GND), measure V_HUM as the
-voltage across R_HUM, when Supply is inverted, measure V_HUM-Vcc as the voltage
-across R_HUM. Small optimization: Values are squared for RMS anyways, calcu-
-late Vcc-V_HUM instead to keep all values unsigned.
+Voltages ~1000 times per second (500Hz square wave, see below). For calculating
+the RMS of the Voltage across R_HUM we have to consider the alternating ground
+of the circuit: When Supply + is Vcc (and Supply - is GND), measure V_HUM as
+the voltage across R_HUM, when Supply is inverted, measure V_HUM-Vcc as the
+voltage across R_HUM. Small optimization: Values are squared for RMS anyways,
+calculate Vcc-V_HUM instead to keep all values unsigned.
+Running at 1Mhz, the ADC frequency can be set to 62.5, 125 or 250 kHz with the
+prescalers 16,8,4 respectively. A maximum ADC frequency of 200kHz is
+recommended if 10 bits of resolution are required. We don't need that, so we'll
+set it to 250kHz. One conversion in free running mode takes 13 clock cycles,
+that's about 19kS/s. Dividing by two for Nyquist yields f_max = 9.5kHz. To
+include at least the first 9 odd harmonics of the excitaiton signal, set the
+excitation frequency to 500Hz.
 

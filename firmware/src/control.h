@@ -32,6 +32,19 @@
 #define PHUM        PC2
 #define DDR_HUM     DDRC
 #define DDHUM       DDC2
+#define HUM_CHNL    2
+
+//humidity sensor excitation +
+#define PORT_EXCIP  PORTB
+#define PEXCIP      PB1
+#define DDR_EXCIP   DDRB
+#define DDEXCIP     DDB1
+
+//humidity sensor excitation -
+#define PORT_EXCIM  PORTB
+#define PEXCIM      PB2
+#define DDR_EXCIM   DDRB
+#define DDEXCIM     DDB2
 
 /*cooling unit temperature sensor
  */
@@ -54,6 +67,10 @@ enum temp_sensor
 };
 
 void control_init();
+
+void excitation_start(void);
+void excitation_stop(void);
+
 uint8_t temp_measure(enum temp_sensor);
 //Fan control routines
 void start_fan(void);

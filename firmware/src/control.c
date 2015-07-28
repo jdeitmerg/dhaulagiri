@@ -9,14 +9,24 @@ void control_init()
     //clearbit(DDRD, DDD6); //just leave it there, shouldn't be set in the
                             //first place
 
+    //ADC setup
     //select AVCC as ADC Reference
     setbit(ADMUX, REFS0);
     //left adjust ADC results
     setbit(ADMUX, ADLAR);
-    //50 - 200 kHz needed, 1MHz provided -> prescaler: 16 -> 62.5kHz
+    //50 - 200 kHz needed, 1MHz provided -> prescaler: 4 -> 250kHz
     clearbit(ADCSRA, ADPS0);
-    clearbit(ADCSRA, ADPS1);
-    setbit(ADCSRA, ADPS2);
+    setbit(ADCSRA, ADPS1);
+    clearbit(ADCSRA, ADPS2);
+
+    //humidity sensor
+    //excitation as outputs, high
+    setbit(DDR_EXCIP, DDEXCIP);
+    setbit(PORT_EXCIP, PEXCIP);
+    setbit(DDR_EXCIM, DDEXCIM);
+    setbit(PORT_EXCIM, PEXCIM);
+    //Analog measurement pin as input
+    clearbit(DDR_HUM, DDHUM);
 }
 
 static void mux_select_ch(uint8_t chnl)
@@ -44,6 +54,32 @@ static void mux_select_ch(uint8_t chnl)
 
     return;
 }
+
+ISR(TIMER0_OVF_vect)
+{
+    TCNT0 = 256-1000/8;  //We need 1000 interrupts/second, prescaler is 8
+    togglebit(PORT_EXCIP, PEXCIP);
+    togglebit(PORT_EXCIM, PEXCIM);
+}
+
+void excitation_start(void)
+{
+    TCNT0 = 256-1000/8;  //We need 1000 interrupts/second, prescaler is 8
+    setbit(TCCR0, CS01); //Set prescaler to 8 and start timer0
+    setbit(TIMSK, TOIE0);   //enable overflow interrupt
+
+    //start first square
+    clearbit(PORT_EXCIM, PEXCIM);
+    setbit(PORT_EXCIP, PEXCIP);
+    return;
+}
+
+void excitation_stop(void)
+{
+    clearbit(TCCR0, CS01);  //stop counting
+    clearbit(TIMSK, TOIE0); //and disable interrupt
+}
+
 
 static uint8_t adc_singleshot()
 {
