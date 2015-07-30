@@ -1,7 +1,12 @@
 #include "common.h"
 #include "control.h"
 
-void control_init()
+#define NUM_HUM_READS 64
+
+volatile uint8_t hum_readings[NUM_HUM_READS];
+volatile uint8_t humread_active = 0;
+
+void control_init(void)
 {
     setbit(DDR_FAN, DDFAN);
     setbit(DDR_COMP, DDCOMP);
@@ -94,6 +99,72 @@ void excitation_stop(void)
     clearbit(TIMSK, TOIE0); //and disable interrupt
 }
 
+ISR(ADC_vect)
+{
+    static volatile uint8_t count = 0;
+
+    //invert value if excitation voltage is inverted
+    if(testbit(PORT_EXCIP, PEXCIP))
+    {
+        hum_readings[count] = ADCH;
+    }
+    else
+    {
+        hum_readings[count] = 255-ADCH;
+    }
+    count++;
+    if(count == NUM_HUM_READS)
+    {
+        count = 0;
+        humread_active = 0;
+        //disable adc interrupt
+        clearbit(ADCSRA, ADIE);
+        //stop adc
+        clearbit(ADCSRA, ADEN);
+    }
+    return;
+}
+
+void sample_hum(void)
+//samples the humidity sensor voltage NUM_HUM_READS times, fills hum_readings
+{
+    mux_select_ch(HUM_CHNL);
+    //set ADC freerunning
+    setbit(ADCSRA, ADFR);
+    //enable interrupt
+    setbit(ADCSRA, ADIE);
+    //enable ADC
+    setbit(ADCSRA, ADEN);
+    //start first conversion
+    setbit(ADCSRA, ADSC);
+
+    humread_active = 1;
+    while(humread_active){}
+    return;
+}
+
+uint16_t hum_measure(void)
+{
+    uint32_t sum = 0;
+    uint8_t i;
+
+    excitation_start();
+    sample_hum();
+    excitation_stop();
+
+    //to calulate RMS voltage, sum squared values, divide by their number and
+    //calculate square root.
+    //assuming less than 2**16 measurements were made, the sum of the squares
+    //(each 16 bit maximum) fits into 32 bits.
+    for(i = 0; i < NUM_HUM_READS; ++i)
+    {
+        sum += hum_readings[i]*hum_readings[i];
+    }
+
+    //don't calculate the sqrt, floating point not feasible
+
+    return((uint16_t) sum/NUM_HUM_READS);
+}
 
 static uint8_t adc_singleshot()
 {

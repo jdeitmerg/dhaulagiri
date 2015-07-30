@@ -68,11 +68,9 @@ enum temp_sensor
     cool_unit = 1
 };
 
-void control_init();
+void control_init(void);
 
-void excitation_start(void);
-void excitation_stop(void);
-
+uint16_t hum_measure(void);
 uint8_t temp_measure(enum temp_sensor);
 //Fan control routines
 void start_fan(void);
