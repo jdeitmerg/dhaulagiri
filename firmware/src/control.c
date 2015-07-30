@@ -57,9 +57,23 @@ static void mux_select_ch(uint8_t chnl)
 
 ISR(TIMER0_OVF_vect)
 {
+    //if both pins are on the same port, write them simultaniously
+#ifdef EXCI_ONE_PORT
+    volatile uint8_t ioreg;
+#endif
+
     TCNT0 = 256-1000/8;  //We need 1000 interrupts/second, prescaler is 8
+#ifdef EXCI_ONE_PORT
+    //load & modify, then write at once so pins change state at the same time
+    ioreg = PORT_EXCIM;
+    togglebit(ioreg, PEXCIP);
+    togglebit(ioreg, PEXCIM);
+    PORT_EXCIM = ioreg;
+#else
     togglebit(PORT_EXCIP, PEXCIP);
     togglebit(PORT_EXCIM, PEXCIM);
+#endif
+    return;
 }
 
 void excitation_start(void)

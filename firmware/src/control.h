@@ -45,6 +45,8 @@
 #define PEXCIM      PB2
 #define DDR_EXCIM   DDRB
 #define DDEXCIM     DDB2
+//humidity sensor excitation on the same port (PORTB)
+#define EXCI_ONE_PORT
 
 /*cooling unit temperature sensor
  */
