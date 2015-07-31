@@ -112,11 +112,13 @@ of the circuit: When Supply + is Vcc (and Supply - is GND), measure V_HUM as
 the voltage across R_HUM, when Supply is inverted, measure V_HUM-Vcc as the
 voltage across R_HUM. Small optimization: Values are squared for RMS anyways,
 calculate Vcc-V_HUM instead to keep all values unsigned.
-Running at 1Mhz, the ADC frequency can be set to 62.5, 125 or 250 kHz with the
-prescalers 16,8,4 respectively. A maximum ADC frequency of 200kHz is
-recommended if 10 bits of resolution are required. We don't need that, so we'll
-set it to 250kHz. One conversion in free running mode takes 13 clock cycles,
-that's about 19kS/s. Dividing by two for Nyquist yields f_max = 9.5kHz. To
-include at least the first 9 odd harmonics of the excitaiton signal, set the
-excitation frequency to 500Hz.
+The impedance is mostly real, so instead of trying to measure the norm of the
+complex impedance, measure in stationarity (~from T/4 to T/2 and 3T/4 to T) and
+calculate real resistance.
+The ADC runs at 62.5kHz, sample and hold takes place in the middle of the
+second adc cycle after the conversion started, so after 1.5*16µs=24µs. As
+there's no sync to the adc clock before starting the conversation, it could
+take 15/16 of an additional adc cycle.
+At 500Hz excitation this doesn't matter much, T/4 is 500µs, so we'll simply
+start the conversation at that point.
 

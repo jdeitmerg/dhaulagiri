@@ -70,7 +70,7 @@ enum temp_sensor
 
 void control_init(void);
 
-uint16_t hum_measure(void);
+uint8_t hum_measure(void);
 uint8_t temp_measure(enum temp_sensor);
 //Fan control routines
 void start_fan(void);

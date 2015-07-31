@@ -1,10 +1,22 @@
 #include "common.h"
 #include "control.h"
 
-#define NUM_HUM_READS 64
+#define NUM_HUM_READS 8
 
 volatile uint8_t hum_readings[NUM_HUM_READS];
 volatile uint8_t humread_active = 0;
+volatile uint8_t cycle_step = 1;
+
+static uint8_t adc_singleshot()
+{
+    //start ADC conversion
+    setbit(ADCSRA, ADSC);
+    //wait for conversion to finish
+    loop_until_bit_is_set(ADCSRA, ADIF);
+    //datasheet: "ADIF is cleared by writing a logical one to the flag"
+    setbit(ADCSRA, ADIF);
+    return(ADCH);
+}
 
 void control_init(void)
 {
@@ -19,10 +31,15 @@ void control_init(void)
     setbit(ADMUX, REFS0);
     //left adjust ADC results
     setbit(ADMUX, ADLAR);
-    //50 - 200 kHz needed, 1MHz provided -> prescaler: 4 -> 250kHz
+    //50 - 200 kHz needed, 1MHz provided -> prescaler: 16 -> 62.5kHz
     clearbit(ADCSRA, ADPS0);
-    setbit(ADCSRA, ADPS1);
-    clearbit(ADCSRA, ADPS2);
+    clearbit(ADCSRA, ADPS1);
+    setbit(ADCSRA, ADPS2);
+    clearbit(ADCSRA, ADFR);
+    //enable ADC and start first conversion, so subsequent ones take only 13
+    //cycles
+    setbit(ADCSRA, ADEN);
+    adc_singleshot();
 
     //humidity sensor
     //excitation as outputs, high
@@ -60,123 +77,114 @@ static void mux_select_ch(uint8_t chnl)
     return;
 }
 
-ISR(TIMER0_OVF_vect)
-{
-    //if both pins are on the same port, write them simultaniously
-#ifdef EXCI_ONE_PORT
-    volatile uint8_t ioreg;
-#endif
-
-    TCNT0 = 256-1000/8;  //We need 1000 interrupts/second, prescaler is 8
-#ifdef EXCI_ONE_PORT
-    //load & modify, then write at once so pins change state at the same time
-    ioreg = PORT_EXCIM;
-    togglebit(ioreg, PEXCIP);
-    togglebit(ioreg, PEXCIM);
-    PORT_EXCIM = ioreg;
-#else
-    togglebit(PORT_EXCIP, PEXCIP);
-    togglebit(PORT_EXCIM, PEXCIM);
-#endif
-    return;
-}
-
-void excitation_start(void)
-{
-    TCNT0 = 256-1000/8;  //We need 1000 interrupts/second, prescaler is 8
-    setbit(TCCR0, CS01); //Set prescaler to 8 and start timer0
-    setbit(TIMSK, TOIE0);   //enable overflow interrupt
-
-    //start first square
-    clearbit(PORT_EXCIM, PEXCIM);
-    setbit(PORT_EXCIP, PEXCIP);
-    return;
-}
-
-void excitation_stop(void)
-{
-    clearbit(TCCR0, CS01);  //stop counting
-    clearbit(TIMSK, TOIE0); //and disable interrupt
-}
-
 ISR(ADC_vect)
 {
     static volatile uint8_t count = 0;
 
-    //invert value if excitation voltage is inverted
-    if(testbit(PORT_EXCIP, PEXCIP))
+    switch(cycle_step)
     {
-        hum_readings[count] = ADCH;
-    }
-    else
-    {
-        hum_readings[count] = 255-ADCH;
+        //assume we get the interrupt of the conversion started in previous
+        //step...
+        case 3:
+            hum_readings[count] = ADCH;
+            break;
+        case 1:
+            //invert value if excitation voltage is inverted
+            hum_readings[count] = 255-ADCH;
+            break;
+        default:
+            //waste some bytes...
+            //printf("\nError: ADC interrupt fired at the wrong time!");
+            break;
     }
     count++;
+
     if(count == NUM_HUM_READS)
     {
         count = 0;
         humread_active = 0;
         //disable adc interrupt
         clearbit(ADCSRA, ADIE);
-        //stop adc
-        clearbit(ADCSRA, ADEN);
     }
     return;
 }
 
-void sample_hum(void)
-//samples the humidity sensor voltage NUM_HUM_READS times, fills hum_readings
+ISR(TIMER0_OVF_vect)
+{
+#ifndef EXCI_ONE_PORT
+#error TIMER0 overflow handler implemented only for EXCI pins on same port!
+#endif
+
+    volatile uint8_t ioreg;
+
+    TCNT0 = 256-1e6/8/2000;  //We need 2000 interrupts/second, cpu freq is
+                             //1Mhz, prescaler is 8
+    switch(cycle_step)
+    {
+        case 1:
+            //t=0, raising edge
+            ioreg = PORT_EXCIM;
+            setbit(ioreg, PEXCIP);
+            clearbit(ioreg, PEXCIM);
+            PORT_EXCIM = ioreg;
+            break;
+        case 2:
+            //t=T/4, sample high
+            setbit(ADCSRA, ADSC);
+            break;
+        case 3:
+            //t=T/2, falling edge
+            ioreg = PORT_EXCIM;
+            clearbit(ioreg, PEXCIP);
+            setbit(ioreg, PEXCIM);
+            PORT_EXCIM = ioreg;
+            break;
+        case 4:
+            //t=3T/4, sample low
+            setbit(ADCSRA, ADSC);
+            cycle_step = 0;
+    }
+    cycle_step++;
+    return;
+}
+
+static void hum_start(void)
 {
     mux_select_ch(HUM_CHNL);
-    //set ADC freerunning
-    setbit(ADCSRA, ADFR);
-    //enable interrupt
+    //enable ADC interrupt
     setbit(ADCSRA, ADIE);
-    //enable ADC
-    setbit(ADCSRA, ADEN);
-    //start first conversion
-    setbit(ADCSRA, ADSC);
 
-    humread_active = 1;
-    while(humread_active){}
+    TCNT0 = 256-1e6/8/2000; //We need 2000 interrupts/second, cpu freq is
+                            //1Mhz, prescaler is 8
+    setbit(TCCR0, CS01);    //Set prescaler to 8 and start timer0
+    setbit(TIMSK, TOIE0);   //enable overflow interrupt
     return;
 }
 
-uint16_t hum_measure(void)
+static void hum_stop(void)
 {
-    uint32_t sum = 0;
-    uint8_t i;
-
-    excitation_start();
-    sample_hum();
-    excitation_stop();
-
-    //to calulate RMS voltage, sum squared values, divide by their number and
-    //calculate square root.
-    //assuming less than 2**16 measurements were made, the sum of the squares
-    //(each 16 bit maximum) fits into 32 bits.
-    for(i = 0; i < NUM_HUM_READS; ++i)
-    {
-        sum += hum_readings[i]*hum_readings[i];
-    }
-
-    //don't calculate the sqrt, floating point not feasible
-
-    return((uint16_t) sum/NUM_HUM_READS);
+    clearbit(TCCR0, CS01);  //stop counting
+    clearbit(TIMSK, TOIE0); //and disable interrupt
+    return;
 }
 
-static uint8_t adc_singleshot()
+uint8_t hum_measure(void)
 {
-    //enable ADC
-    setbit(ADCSRA, ADEN);
-    //start ADC conversion
-    setbit(ADCSRA, ADSC);
-    //wait for conversion to finish
-    loop_until_bit_is_set(ADCSRA, ADIF);
-    //datasheet: "ADIF is cleared by writing a logical one to the flag"
-    setbit(ADCSRA, ADIF);
-    return(ADCH);
+    uint16_t sum = 0;
+    uint8_t i;
+
+    hum_start();
+    humread_active = 1;
+    while(humread_active){}
+    hum_stop();
+
+    //hum_readings should now be filled with values, calculate average
+    for(i = 0; i < NUM_HUM_READS; ++i)
+    {
+        sum += hum_readings[i];
+    }
+
+    return((uint8_t) sum/NUM_HUM_READS);
 }
 
 static uint8_t temp_celsius(enum temp_sensor sensor, uint8_t rawval)
