@@ -1,11 +1,11 @@
 #include "common.h"
 #include "control.h"
 
-#define NUM_HUM_READS 8
+#define NUM_HUM_READS 32
 
 volatile uint8_t hum_readings[NUM_HUM_READS];
 volatile uint8_t humread_active = 0;
-volatile uint8_t cycle_step = 1;
+volatile uint8_t cycle_step = 0;
 
 static uint8_t adc_singleshot()
 {
@@ -85,10 +85,10 @@ ISR(ADC_vect)
     {
         //assume we get the interrupt of the conversion started in previous
         //step...
-        case 3:
+        case 2:
             hum_readings[count] = ADCH;
             break;
-        case 1:
+        case 0: //conversion was started in cycle 4, then cycle was reset
             //invert value if excitation voltage is inverted
             hum_readings[count] = 255-ADCH;
             break;
@@ -119,6 +119,7 @@ ISR(TIMER0_OVF_vect)
 
     TCNT0 = 256-1e6/8/2000;  //We need 2000 interrupts/second, cpu freq is
                              //1Mhz, prescaler is 8
+    cycle_step++;
     switch(cycle_step)
     {
         case 1:
@@ -144,7 +145,6 @@ ISR(TIMER0_OVF_vect)
             setbit(ADCSRA, ADSC);
             cycle_step = 0;
     }
-    cycle_step++;
     return;
 }
 
@@ -156,14 +156,16 @@ static void hum_start(void)
 
     TCNT0 = 256-1e6/8/2000; //We need 2000 interrupts/second, cpu freq is
                             //1Mhz, prescaler is 8
-    setbit(TCCR0, CS01);    //Set prescaler to 8 and start timer0
+//    setbit(TCCR0, CS01);    //Set prescaler to 8 and start timer0
+    TCCR0 = 1<<CS01;
     setbit(TIMSK, TOIE0);   //enable overflow interrupt
     return;
 }
 
 static void hum_stop(void)
 {
-    clearbit(TCCR0, CS01);  //stop counting
+    //clearbit(TCCR0, CS01);  //stop counting
+    TCCR0 = 0x00;
     clearbit(TIMSK, TOIE0); //and disable interrupt
     return;
 }
@@ -184,7 +186,7 @@ uint8_t hum_measure(void)
         sum += hum_readings[i];
     }
 
-    return((uint8_t) sum/NUM_HUM_READS);
+    return((uint8_t) (sum/NUM_HUM_READS));
 }
 
 static uint8_t temp_celsius(enum temp_sensor sensor, uint8_t rawval)
