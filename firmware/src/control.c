@@ -1,5 +1,6 @@
 #include "common.h"
 #include "control.h"
+#include <math.h>
 
 #define NUM_HUM_READS 32
 
@@ -170,10 +171,62 @@ static void hum_stop(void)
     return;
 }
 
+static uint8_t hum_from_imp(double imp, uint8_t temperature)
+//Humidity in percent from impedance
+{
+    //constants from datasheet, factor 100 to get percent
+    const double constants[6][4] = {
+        {100*2.795953, -2346.986, 0.1299848, 4.067295},
+        {100*10.83324, -2368.839, 28.18587, 3.016073},
+        {100*29.29039, -2426.034, 49399.25, 1.993527},
+        {100*2.79711, -7813.2, 100848.4, 9.437572},
+        {100*5.729313, -5357.106, 19934420, 4.242907},
+        {100*3.158756, -6368.854, 1247857, 5.748199}};
+    uint8_t range;  //impedance range, for selecting constant
+    double temp;
+
+    if(imp <= .005)
+        range = 5;
+    else if(imp <= .05)
+        range = 4;
+    else if(imp <= 5)
+        range = 3;
+    else if(imp <= 12)
+        range = 2;
+    else if(imp <= 30)
+        range = 1;
+    else
+        range = 0;
+
+    //temperature in fahrenheit
+    temp = 1.8*temperature+32.;
+
+    //UPS-500 Equation
+    temp += 459.7;
+    temp = 1/(constants[range][3]+constants[range][1]/temp);
+    temp = pow(imp*constants[range][2], temp);
+    temp *= constants[range][0];
+
+    return((uint8_t) temp);
+}
+
+static double imp_from_adc(uint8_t adcval)
+//calculate impedance (im meg-ohms) of humidity sensor based on raw ADC value
+{
+    if(adcval == 0)
+        return(0);
+    if(adcval == 255)
+        return(40);    //made up, probably never gonna be that dry
+    //R38=47kOhms voltage divider
+    return(.047/(255./adcval-1.));
+}
+
 uint8_t hum_measure(void)
 {
     uint16_t sum = 0;
     uint8_t i;
+    uint8_t temperature;
+    double impedance;
 
     hum_start();
     humread_active = 1;
@@ -186,7 +239,10 @@ uint8_t hum_measure(void)
         sum += hum_readings[i];
     }
 
-    return((uint8_t) (sum/NUM_HUM_READS));
+    temperature = temp_measure(ambient);
+    impedance = imp_from_adc((uint8_t) (sum/NUM_HUM_READS));
+
+    return(hum_from_imp(impedance, temperature));
 }
 
 static uint8_t temp_celsius(enum temp_sensor sensor, uint8_t rawval)

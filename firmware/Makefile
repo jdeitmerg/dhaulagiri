@@ -1,5 +1,5 @@
 CC = avr-gcc
-CC_ARGS = -Wall -O1
+CC_ARGS = -Wall -O1 -lm
 SRC_DIR = src
 BUILD_DIR = bin
 #Programmer device type
