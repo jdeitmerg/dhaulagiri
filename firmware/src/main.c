@@ -27,7 +27,8 @@ int main(void)
     {
         //printf("\namb: %u deg C\tunit:%u deg C", temp_measure(ambient),
         //       temp_measure(cool_unit));
-        printf("\nhumidity: %u%%", hum_measure());
+        //printf("\nhumidity: %u%%", hum_measure());
+        io_print_nbr(hum_measure());
         _delay_ms(300);
     }
 }

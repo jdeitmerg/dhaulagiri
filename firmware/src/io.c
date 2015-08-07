@@ -298,3 +298,21 @@ void io_init(void)
     register_timer(&disp_cycle, 1024);
 }
 
+void io_print_nbr(uint8_t nbr)
+/*Print number between 0 and 99 on 7-segment display.
+ *Clears display if the given number is not in that range.
+ */
+{
+    if(nbr > 99)
+    {
+        DIS0_state = 0xFF;
+        DIS1_state = 0xFF;
+    }
+    else
+    {
+        DIS0_state = dis_digits[nbr%10];
+        DIS1_state = dis_digits[nbr/10];
+    }
+    return;
+}
+
