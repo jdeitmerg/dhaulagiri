@@ -53,7 +53,7 @@ uint8_t dis_letters[] = {
     ~0x5B   //'Z' like '2'
 };
 
-uint8_t dischar(char letter)
+static uint8_t dischar(char letter)
 /*Return 7 segment state of any of the characters we have defined above
  */
 {
@@ -76,69 +76,45 @@ uint8_t dischar(char letter)
     }
 }
 
-/*In case we need a size reduction: making these inline functions static
- *frees up more than 500 bytes.
- */
-
-inline uint8_t disdigit(uint8_t digit)
-{
-    return dis_digits[digit];
-}
-
 /*There's a transistor between the AVR pin and the LEDC pin, so our signal
  *get's inverted.
  */
 
-inline void set_LEDC()
+static void set_LEDC()
 {
     clearbit(PORT_IOLED, PIOLED);
 }
 
-inline void clear_LEDC()
+static void clear_LEDC()
 {
     setbit(PORT_IOLED, PIOLED);
-}
-
-inline void toggle_LEDC()
-{
-    togglebit(PORT_IOLED, PIOLED);
 }
 
 /*There's a transistor between the AVR pin and the pin of the 7-segment
  *dispaly, so our signal get's inverted.
  */
 
-inline void set_DIS0()
+static void set_DIS0()
 {
     clearbit(PORT_IODIS0, PIODIS0);
 }
 
-inline void clear_DIS0()
+static void clear_DIS0()
 {
     setbit(PORT_IODIS0, PIODIS0);
 }
 
-inline void toggle_DIS0()
-{
-    togglebit(PORT_IODIS0, PIODIS0);
-}
-
-inline void set_DIS1()
+static void set_DIS1()
 {
     clearbit(PORT_IODIS1, PIODIS1);
 }
 
-inline void clear_DIS1()
+static void clear_DIS1()
 {
     setbit(PORT_IODIS1, PIODIS1);
 }
 
-inline void toggle_DIS1()
-{
-    togglebit(PORT_IODIS1, PIODIS1);
-}
-
-inline void pulse_ioclk()
+static void pulse_ioclk()
 {
     //short pulse on CLK, "clocking occurs on the low-to-high-level transition"
     //assume CLK line is low!
@@ -148,7 +124,7 @@ inline void pulse_ioclk()
     clearbit(PORT_IOCLK, PIOCLK);
 }
 
-inline void shiftr_pushb(uint8_t bit)
+static void shiftr_pushb(uint8_t bit)
 /*Push a single bit into the shift register of the IO panel (IC5)
  */
 {
@@ -164,7 +140,7 @@ inline void shiftr_pushb(uint8_t bit)
     pulse_ioclk();
 }
 
-void shiftr_setval(uint8_t value)
+static void shiftr_setval(uint8_t value)
 /*Pushes the given value into the shift register of the IO panel (IC5)
  *We don't do any abstraction between this and setting 7seg / LED patterns
  */
@@ -181,7 +157,7 @@ void shiftr_setval(uint8_t value)
     }
 }
 
-inline uint8_t io_switches_raw(void)
+static uint8_t io_switches_raw(void)
 /*Test the switches SW1 to SW4 and returns ored states*/
 {
     //we don't need to clear LEDC, DIS0, DIS1, disp_cycle just did that.
@@ -194,7 +170,7 @@ inline uint8_t io_switches_raw(void)
     return(state);
 }
 
-inline void switch_handler(void)
+static void switch_handler(void)
 {
     //we don't need to do this very often
     //Maybe we could share this time slot with the LEDs then...
@@ -219,19 +195,19 @@ inline void switch_handler(void)
     old_state = new_state;
     if(switches & SW_ONOFF)
     {
-        DIS0_state = disdigit(countup++ %10);
+        DIS0_state = dis_digits[countup++ %10];
     }
     if(switches & SW_DOWN)
     {
-        DIS0_state = disdigit(countup++ %10);
+        DIS0_state = dis_digits[countup++ %10];
     }
     if(switches & SW_UP)
     {
-        DIS0_state = disdigit(countup++ %10);
+        DIS0_state = dis_digits[countup++ %10];
     }
     if(switches & SW_CONT)
     {
-        DIS0_state = disdigit(countup++ %10);
+        DIS0_state = dis_digits[countup++ %10];
     }
 }
 
@@ -321,3 +297,4 @@ void io_init(void)
 
     register_timer(&disp_cycle, 1024);
 }
+
