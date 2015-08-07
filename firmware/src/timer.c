@@ -55,7 +55,6 @@ int8_t register_timer(void (*fptr)(void), uint32_t ival)
 /*Register a function which is to be called every $inval cpu cycles. To get
  *good performance, these intervals should all be powers of two (It should
  *also work well with non power of two values, but for some reason it doesn't).
- *Note there is no way to stop your function from being called yet.
  *
  *Return values:
  *  0-127   id of sucessfully configured new timer. Needed to deregister later.
