@@ -50,6 +50,10 @@ void control_init(void)
     setbit(PORT_EXCIM, PEXCIM);
     //Analog measurement pin as input
     clearbit(DDR_HUM, DDHUM);
+
+    //water full sensor
+    clearbit(DDR_FULL, DDFULL);
+    setbit(PORT_FULL, PFULL);   //enable pullup
 }
 
 static void mux_select_ch(uint8_t chnl)
@@ -320,3 +324,9 @@ void toggle_comp(void)
 {
     togglebit(PORT_COMP, PCOMP);
 }
+
+uint8_t water_full(void)
+{
+    return(!testbit(PIN_FULL, PFULL));
+}
+

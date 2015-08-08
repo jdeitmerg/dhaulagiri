@@ -58,6 +58,7 @@
 /*water full sensor
  */
 #define PORT_FULL   PORTB
+#define PIN_FULL    PINB
 #define PFULL       PB0
 #define DDR_FULL    DDRB
 #define DDFULL      DDB0
@@ -80,5 +81,7 @@ void toggle_fan(void);
 void start_comp(void);
 void stop_comp(void);
 void toggle_comp(void);
+
+uint8_t water_full(void);
 
 #endif
