@@ -327,6 +327,6 @@ void toggle_comp(void)
 
 uint8_t water_full(void)
 {
-    return(!testbit(PIN_FULL, PFULL));
+    return(testbit(PIN_FULL, PFULL));
 }
 
