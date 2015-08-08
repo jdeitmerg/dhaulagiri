@@ -13,6 +13,15 @@
 /*definitions common to all modules
  */
 
+extern uint8_t ref_hum; //humidity at which to start drying
+#define ref_hum_var 3   //stop drying at ref_hum-3
+enum statev
+{
+    ok,
+    waterfull
+};
+extern enum statev state;
+
 //Bit operations
 #define setbit(byte, bit) ((byte) |= ((1) << (bit)))
 #define clearbit(byte, bit) ((byte) &= ~((1) << (bit)))

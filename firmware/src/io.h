@@ -47,7 +47,7 @@
 #define SW_CONT     0x08
 
 void io_init(void);
-void io_set_LEDs(uint8_t state);
+void io_set_LEDs(uint8_t st);
 void io_print_nbr(uint8_t nbr);
 
 #endif

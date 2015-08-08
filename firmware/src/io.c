@@ -185,9 +185,6 @@ static void switch_handler(void)
     static uint8_t old_state;   //For checking whether switches were pressed
                                 //before
 
-    //For now, we'll just have all the buttons increment a digit on DIS0.
-    static uint8_t countup = 0;
-
     uint8_t new_state;
     new_state = io_switches_raw();
     //only do something when the switch wasn't pressed before
@@ -195,19 +192,24 @@ static void switch_handler(void)
     old_state = new_state;
     if(switches & SW_ONOFF)
     {
-        DIS0_state = dis_digits[countup++ %10];
-    }
-    if(switches & SW_DOWN)
-    {
-        DIS0_state = dis_digits[countup++ %10];
     }
     if(switches & SW_UP)
     {
-        DIS0_state = dis_digits[countup++ %10];
+        if(ref_hum < 99);
+        {
+            io_print_nbr(++ref_hum);
+        }
+    }
+    if(switches & SW_DOWN)
+    {
+        if(ref_hum > ref_hum_var)
+        {
+            io_print_nbr(--ref_hum);
+        }
     }
     if(switches & SW_CONT)
     {
-        DIS0_state = dis_digits[countup++ %10];
+        state = ok;
     }
 }
 
@@ -249,11 +251,11 @@ void disp_cycle(void)
     }
 }
 
-void io_set_LEDs(uint8_t state)
+void io_set_LEDs(uint8_t st)
 /*Set the LEDs according to the given state (probably ored LED_*)
  */
 {
-    LEDs_state = state;
+    LEDs_state = ~st;
 }
 
 void ticker_pr(char str[])
@@ -296,6 +298,9 @@ void io_init(void)
     clear_DIS1();
 
     register_timer(&disp_cycle, 1024);
+
+    io_print_nbr(ref_hum);
+    io_set_LEDs(LED_ONOFF);
 }
 
 void io_print_nbr(uint8_t nbr)
