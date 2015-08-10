@@ -66,7 +66,13 @@ int main(void)
                 stop_fan();
                 state = waterfull;
             }
+            break;
+        case off:
+            io_set_LEDs(0);
+            io_print_nbr(100);  //clear display
+            stop_comp();
+            stop_fan();
         }
-        _delay_ms(1000);
+        _delay_ms(300);
     }
 }

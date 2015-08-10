@@ -1,4 +1,5 @@
 #include "common.h"
+#include <avr/wdt.h>
 #include <util/delay_basic.h>
 #include "timer.h"
 #include "io.h"
@@ -192,24 +193,41 @@ static void switch_handler(void)
     old_state = new_state;
     if(switches & SW_ONOFF)
     {
-    }
-    if(switches & SW_UP)
-    {
-        if(ref_hum < 99);
+        if(state == off)
         {
-            io_print_nbr(++ref_hum);
+            //perform reset by enabling watchdog (15ms) and waiting
+            cli();
+            wdt_enable(WDTO_15MS);
+            while(1){};
+        }
+        else
+        {
+            state = off;
         }
     }
-    if(switches & SW_DOWN)
+    if(state != off)
     {
-        if(ref_hum > ref_hum_var)
+        if(switches & SW_UP)
         {
-            io_print_nbr(--ref_hum);
+            if(ref_hum < 99);
+            {
+                io_print_nbr(++ref_hum);
+            }
         }
-    }
-    if(switches & SW_CONT)
-    {
-        state = ok;
+        if(switches & SW_DOWN)
+        {
+            if(ref_hum > ref_hum_var)
+            {
+                io_print_nbr(--ref_hum);
+            }
+        }
+        if(switches & SW_CONT)
+        {
+            if(state == waterfull)
+            {
+                state = ok;
+            }
+        }
     }
 }
 
