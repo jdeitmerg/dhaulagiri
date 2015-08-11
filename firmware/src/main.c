@@ -9,7 +9,9 @@
 uint8_t ref_hum = 25;
 enum statev state = ok;
 
-#define REF_TDIFF   8   //keep cooling unit x°C below ambient temperature
+//keep cooling unit between these two values (°C) below ambient temperature
+#define REF_TDIFF_L     7
+#define REF_TDIFF_H     10
 
 void init(void) {
     uart_init();
@@ -46,11 +48,11 @@ int main(void)
             {
                 start_fan();
                 tempdiff = temp_measure(ambient)-temp_measure(cool_unit);
-                if(tempdiff < REF_TDIFF)
+                if(tempdiff < REF_TDIFF_L)
                 {
                     start_comp();
                 }
-                else
+                else if(tempdiff > REF_TDIFF_H)
                 {
                     stop_comp();
                 }
