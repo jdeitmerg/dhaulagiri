@@ -1,7 +1,7 @@
 #Air Dehumidifier Controller
 **dhaulagiri** is a replacement controller for an air dehumidifier (probably a predecessor model of the prem-i-air EH1220).
 
-###Air Dehumidifier Overview:browse confirm wa
+###Air Dehumidifier Overview
 The dehumidifier consists of a little compressor, a cooling unit with a fan and some sensors. The compressor is used to cool down the air intake side of the cooling unit. The fan is used to draw air through the cooling unit, which lets the moist in the air condense on it. To keep the temperature of the cooling unit at a constant value below the ambient temperature, both have to be measured continuously. Obviously the humidity of the incoming air has to be measured as well. There is a sensor which detects whether the catch basin is full. Finally, there is an IO panel for user interaction.
 
 ###Hardware
