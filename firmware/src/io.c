@@ -162,13 +162,13 @@ static uint8_t io_switches_raw(void)
 /*Test the switches SW1 to SW4 and returns ored states*/
 {
     //we don't need to clear LEDC, DIS0, DIS1, disp_cycle just did that.
-    uint8_t i, state = 0;
+    uint8_t i, swstate = 0;
     for(i = 0; i < 4; ++i)
     {
         shiftr_setval(~(1<<i));    //SW1, ..., SW4
-        state |= testbit(~PIN_IOKEY, PIOKEY) << i;
+        swstate |= testbit(~PIN_IOKEY, PIOKEY) << i;
     }
-    return(state);
+    return(swstate);
 }
 
 static void switch_handler(void)
@@ -191,6 +191,16 @@ static void switch_handler(void)
     //only do something when the switch wasn't pressed before
     uint8_t switches = (old_state ^ new_state) & new_state;
     old_state = new_state;
+
+    //char pressed[] = "pressed";
+    //char released[] = "released";
+
+    //printf("Buttons: ONOFF %s | UP %s | DOWN %s | CONT %s\n",
+    //        switches & SW_ONOFF ? pressed : released,
+    //        switches & SW_UP    ? pressed : released,
+    //        switches & SW_DOWN  ? pressed : released,
+    //        switches & SW_CONT  ? pressed : released);
+
     if(switches & SW_ONOFF)
     {
         if(state == off)
