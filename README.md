@@ -21,3 +21,5 @@ As the base functionality is provided, there is still a lot of room for other mo
 * *io_panel_PCB* evolved while reverse engineering the IO PCB
 * *Curve_fitting.ods* was used to find a polynomial approximation of temperatures from the sensor readings
 
+###Further Information
+[This blog post](http://pointless-circuits.com/blog/2015/08/15/revival-of-an-air-dehumidifier) describes the evolution of this project.
