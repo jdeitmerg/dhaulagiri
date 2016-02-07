@@ -10,8 +10,8 @@ uint8_t ref_hum = 25;
 enum statev state = ok;
 
 //keep cooling unit between these two values (°C) below ambient temperature
-#define REF_TDIFF_L     7
-#define REF_TDIFF_H     10
+#define REF_TDIFF_L     3
+#define REF_TDIFF_H     6
 
 void init(void) {
     uart_init();
