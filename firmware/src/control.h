@@ -84,4 +84,8 @@ void toggle_comp(void);
 
 uint8_t water_full(void);
 
+//for debugging:
+uint8_t temp_rawval(void);
+uint8_t hum_rawval(void);
+
 #endif

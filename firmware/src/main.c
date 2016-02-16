@@ -33,6 +33,7 @@ int main(void)
 
     uint8_t hum;
     int8_t tempdiff;    //temperature diff of air and cooling unit
+    uint8_t infocounter = 0;    //for printing info once a minute
 
     while(1)
     {
@@ -76,5 +77,13 @@ int main(void)
             stop_fan();
         }
         _delay_ms(300);
+        if(infocounter++ >= 200)
+        {
+            printf("T1, T2, T3 | H1, H2, H3 : %d, %d, %d | %d, %d, %d\n",
+                    temp_rawval(), temp_rawval(), temp_rawval(),
+                    hum_rawval(), hum_rawval(), hum_rawval());
+
+            infocounter = 0;
+        }
     }
 }

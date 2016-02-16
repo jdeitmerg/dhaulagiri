@@ -293,6 +293,25 @@ uint8_t temp_measure(enum temp_sensor sensor)
     return(temp_celsius(sensor, raw_adc));
 }
 
+uint8_t temp_rawval(void)
+{
+    //ambient temp: chnl 3
+    mux_select_ch(3);
+    return(adc_singleshot());
+}
+
+uint8_t hum_rawval(void)
+//cycle through 3 last raw adc values from humidity sensor
+{
+    static uint8_t ring = 3;
+
+    if(ring++ >= 3)
+    {
+        ring = 0;
+    }
+    return(hum_readings[ring]);
+}
+
 //Fan control routines
 void start_fan(void)
 {
