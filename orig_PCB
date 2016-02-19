@@ -79,9 +79,9 @@ Humidity Sensor Connector 'CN1'
 ===============================
 Pinout (top to bottom)
 ----------------------
-1   PORTB.2/AN6   100k:100k voltage divider to NTC (ambient temperature)
+1   PORTB.2/AN6   100k:100k voltage divider to NTC (ambient temperature)    GND
 2   VCC
-3   PORTB.3/AN7   V_HUM
+3   PORTB.3/AN7   V_HUM                                                     DATA
 4   PORTC.1/Vref  Supply +
 5   PORTD.0       Supply -
 

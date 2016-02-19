@@ -14,14 +14,13 @@ References:
 #ifndef DHT_H_
 #define DHT_H_
 
-#include <stdio.h>
-#include <avr/io.h>
+#include "common.h"
 
 //setup port
-#define DHT_DDR DDRD
-#define DHT_PORT PORTD
-#define DHT_PIN PIND
-#define DHT_INPUTPIN PD6
+#define DHT_DDR DDRC
+#define DHT_PORT PORTC
+#define DHT_PIN PINC
+#define DHT_INPUTPIN PC2
 
 //sensor type
 #define DHT_DHT11 1
@@ -32,7 +31,7 @@ References:
 #if DHT_TYPE == DHT_DHT11
 #define DHT_FLOAT 0
 #elif DHT_TYPE == DHT_DHT22
-#define DHT_FLOAT 1
+#define DHT_FLOAT 0
 #endif
 
 //timeout retries

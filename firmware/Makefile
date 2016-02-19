@@ -4,12 +4,13 @@ OBJCOPY = avr-objcopy
 SRC_DIR = src
 BUILD_DIR = bin
 #Programmer device type
-#PG_TYPE = stk500
+PG_TYPE = stk500
 #Programmer serial device
-#PG_PORT = /dev/ttyUSB0
+PG_PORT = /dev/serial/by-id/usb-Silicon_Labs_myAVR_-_mySmartUSB_light_mySmartUSBlight*
 
 #Serial device used for boot load programming
 SER_DEV = /dev/serial/by-id/*USB-Serial_Controller*
+#SER_DEV = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_*
 SER_BAUD = 9600
 
 MMCU = atmega8

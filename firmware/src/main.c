@@ -4,6 +4,7 @@
 #include "timer.h"
 #include "uart.h"
 #include "control.h"
+#include "dht.h"
 
 //visible in all modules as declared in common.h
 uint8_t ref_hum = 25;
@@ -31,12 +32,18 @@ int main(void)
 {
     init();
 
-    uint8_t hum;
+    int8_t hum;
+    int8_t ambient_temp;
     int8_t tempdiff;    //temperature diff of air and cooling unit
 
     while(1)
     {
-        hum = hum_measure();
+        if(dht_gettemperaturehumidity(&ambient_temp, &hum))
+        {
+            hum = 30;
+            ambient_temp = 21;
+        }
+
         switch(state)
         {
         case waterfull:
@@ -47,7 +54,7 @@ int main(void)
             if(hum > ref_hum)
             {
                 start_fan();
-                tempdiff = temp_measure(ambient)-temp_measure(cool_unit);
+                tempdiff = ambient_temp-temp_measure(cool_unit);
                 if(tempdiff < REF_TDIFF_L)
                 {
                     start_comp();
