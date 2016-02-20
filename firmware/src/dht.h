@@ -17,10 +17,10 @@ References:
 #include "common.h"
 
 //setup port
-#define DHT_DDR DDRC
-#define DHT_PORT PORTC
-#define DHT_PIN PINC
-#define DHT_INPUTPIN PC2
+#define DHT_DDR DDRB
+#define DHT_PORT PORTB
+#define DHT_PIN PINB
+#define DHT_INPUTPIN PB1
 
 //sensor type
 #define DHT_DHT11 1
