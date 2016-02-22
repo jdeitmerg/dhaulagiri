@@ -28,10 +28,13 @@ References:
 #define DHT_TYPE DHT_DHT22
 
 //enable decimal precision (float)
+
+//You MAY NOT enable this manually, DHT_FLOAT needs to be 0 for DHT11 and
+//1 for DHT22!!
 #if DHT_TYPE == DHT_DHT11
 #define DHT_FLOAT 0
 #elif DHT_TYPE == DHT_DHT22
-#define DHT_FLOAT 0
+#define DHT_FLOAT 1
 #endif
 
 //timeout retries

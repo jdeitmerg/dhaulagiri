@@ -33,16 +33,22 @@ int main(void)
     init();
 
     int8_t hum;
+    float hum_f;
+
     int8_t ambient_temp;
+    float ambient_temp_f;
+
     int8_t tempdiff;    //temperature diff of air and cooling unit
 
     while(1)
     {
-        if(dht_gettemperaturehumidity(&ambient_temp, &hum))
+        if(dht_gettemperaturehumidity(&ambient_temp_f, &hum_f))
         {
             hum = 30;
             ambient_temp = 21;
         }
+        hum = hum_f;
+        ambient_temp = ambient_temp_f;
 
         switch(state)
         {
