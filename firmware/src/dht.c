@@ -35,7 +35,7 @@ int8_t dht_getdata(int8_t *temperature, int8_t *humidity) {
 	#if DHT_TYPE == DHT_DHT11
 	_delay_ms(18);
 	#elif DHT_TYPE == DHT_DHT22
-	_delay_us(500);
+	_delay_ms(10);
 	#endif
 	DHT_PORT |= (1<<DHT_INPUTPIN); //high
 	DHT_DDR &= ~(1<<DHT_INPUTPIN); //input
