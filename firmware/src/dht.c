@@ -26,9 +26,10 @@ int8_t dht_getdata(int8_t *temperature, int8_t *humidity) {
 	memset(bits, 0, sizeof(bits));
 
 	//reset port
+    //assume it was input before, then the data line is high as there's an
+    //external pullup
 	DHT_DDR |= (1<<DHT_INPUTPIN); //output
 	DHT_PORT |= (1<<DHT_INPUTPIN); //high
-	_delay_ms(100);
 
 	//send request
 	DHT_PORT &= ~(1<<DHT_INPUTPIN); //low
@@ -81,7 +82,6 @@ int8_t dht_getdata(int8_t *temperature, int8_t *humidity) {
 	//reset port
 	DHT_DDR |= (1<<DHT_INPUTPIN); //output
 	DHT_PORT |= (1<<DHT_INPUTPIN); //low
-	_delay_ms(100);
 
 	//check checksum
 	if ((uint8_t)(bits[0] + bits[1] + bits[2] + bits[3]) == bits[4]) {
