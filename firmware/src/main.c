@@ -20,6 +20,9 @@ enum statev state = ok;
 //the reference humidity is saved every few seconds so it survives reboots
 #define EEPROM_REF_HUM (uint8_t*)0x00
 
+//read from humidity (and ambient temperature) sensor only every 10 seconds
+#define HUM_READ_DELAY 10*1000/MAIN_LOOP_DELAY
+
 void init(void) {
     uart_init();
 
@@ -50,6 +53,8 @@ int main(void)
     int8_t tempdiff;    //temperature diff of air and cooling unit
 
     uint8_t ref_hum_age = 0;    //iterations since last eeprom update
+    uint8_t dht_age = HUM_READ_DELAY;   //iterations since last dht sensor
+                                        //update
 
     //Sane defaults in case values can't be read in the first iteration
     hum = ref_hum;
@@ -57,11 +62,15 @@ int main(void)
 
     while(1)
     {
-        if(dht_gettemperaturehumidity(&ambient_temp_f, &hum_f) == 0)
+        if(++dht_age > HUM_READ_DELAY)
         {
-            //only update if successful
-            hum = hum_f;
-            ambient_temp = ambient_temp_f;
+            if(dht_gettemperaturehumidity(&ambient_temp_f, &hum_f) == 0)
+            {
+                //only update if successful
+                hum = hum_f;
+                ambient_temp = ambient_temp_f;
+            }
+            dht_age = 0;
         }
 
         if(++ref_hum_age > 5*1000/MAIN_LOOP_DELAY)
