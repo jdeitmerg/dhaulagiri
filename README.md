@@ -13,7 +13,7 @@ The software running on the AVR mimics the functionality of the original control
 At this point, you can set a reference humidity and the device will regulate the rooms humidity to that level.
 
 ### Project Status
-**Current master branch not working** as reading from the DHT22 fails.
+**Firmware runs and dehumidifier works as intended.**
 
 ###ToDo
 Although the base functionality is provided, there is still a lot of room for other modes of operation to be implemented. Also, the uart interface was made easily accessible  which allows simple programming and debugging, but could also be used to e.g. log measurement values. 
