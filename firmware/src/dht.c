@@ -53,6 +53,7 @@ int8_t dht_getdata(int8_t *temperature, int8_t *humidity) {
 	}
 	_delay_us(80);
 
+        cli();
 	//read the data
 	uint16_t timeoutcounter = 0;
 	for (j=0; j<5; j++) { //read 5 byte
@@ -82,6 +83,8 @@ int8_t dht_getdata(int8_t *temperature, int8_t *humidity) {
 	//reset port
 	DHT_DDR |= (1<<DHT_INPUTPIN); //output
 	DHT_PORT |= (1<<DHT_INPUTPIN); //high
+
+        sei();
 
 	//check checksum
 	if ((uint8_t)(bits[0] + bits[1] + bits[2] + bits[3]) == bits[4]) {
