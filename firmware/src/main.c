@@ -11,9 +11,9 @@
 uint8_t ref_hum;
 enum statev state = ok;
 
-//keep cooling unit between these two values (Â°C) below ambient temperature
+//keep cooling unit between these two values (°C) below ambient temperature
 #define REF_TDIFF_L     7
-#define REF_TDIFF_H     10
+#define REF_TDIFF_H     9
 
 #define MAIN_LOOP_DELAY 300 //ms
 

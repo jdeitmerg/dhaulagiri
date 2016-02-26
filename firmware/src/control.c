@@ -89,7 +89,9 @@ static uint8_t temp_celsius(uint8_t rawval)
     result = inval*inval;
     result *= 0.0004351878;
     result += 0.2011721783*inval;
-    result += -10.5522104343;
+    // Should be -10.5522104343, just a quick fix to make measurement
+    // plausible.
+    result += -4.5522104343;
 
     return((uint8_t) result);
 }
