@@ -67,48 +67,40 @@ static void mux_select_ch(uint8_t chnl)
     return;
 }
 
-static uint8_t temp_celsius(enum temp_sensor sensor, uint8_t rawval)
-//convert raw ADC value to temperature in Â°C
+static uint8_t temp_celsius(uint8_t rawval)
+//convert raw ADC value to temperature in °C
 {
-    //Interpolation polynominal factors:
-    //ambient first, cooling unit second
-    static const double interpfactors[2][3] =
-        {{0.000640967, 0.1431304871, -11.6516721212},
-         {0.0004351878, 0.2011721783, -10.5522104343}};
-    //Interpolation ranges (return lowest/highest if outside)
-    static const uint8_t interpranges[2][2] =
-        {{87, 238}, {70, 230}};
     double result;
     double inval;
 
-    if(rawval < interpranges[sensor][0])
+    //Keep value in interpolation ranges
+    if(rawval < 70)
     {
-        rawval = interpranges[sensor][0];
+        rawval = 70;
     }
-    else if(rawval > interpranges[sensor][1])
+    else if(rawval > 230)
     {
-        rawval = interpranges[sensor][1];
+        rawval = 230;
     }
 
     inval = (double) rawval;
 
+    //Polynominal interpolation
     result = inval*inval;
-    result *= interpfactors[sensor][0];
-    result += interpfactors[sensor][1]*inval;
-    result += interpfactors[sensor][2];
+    result *= 0.0004351878;
+    result += 0.2011721783*inval;
+    result += -10.5522104343;
 
     return((uint8_t) result);
 }
 
-uint8_t temp_measure(enum temp_sensor sensor)
+uint8_t temp_measure(void)
 {
-    //ambient first, cooling unit second
-    static const uint8_t adc_chnls[2] = {3, 1};
     uint8_t raw_adc;
 
-    mux_select_ch(adc_chnls[sensor]);
+    mux_select_ch(1);
     raw_adc = adc_singleshot();
-    return(temp_celsius(sensor, raw_adc));
+    return(temp_celsius(raw_adc));
 }
 
 //Fan control routines

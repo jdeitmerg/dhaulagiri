@@ -34,15 +34,9 @@
 #define DDR_FULL    DDRB
 #define DDFULL      DDB0
 
-enum temp_sensor
-{
-    ambient = 0,
-    cool_unit = 1
-};
-
 void control_init(void);
 
-uint8_t temp_measure(enum temp_sensor);
+uint8_t temp_measure(void);
 //Fan control routines
 void start_fan(void);
 void stop_fan(void);

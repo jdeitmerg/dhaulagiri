@@ -93,7 +93,7 @@ int main(void)
             if(hum > ref_hum)
             {
                 start_fan();
-                tempdiff = ambient_temp-temp_measure(cool_unit);
+                tempdiff = ambient_temp-temp_measure();
                 if(tempdiff < REF_TDIFF_L)
                 {
                     start_comp();
