@@ -36,6 +36,9 @@ void init(void) {
     //read reference humidity stored in eeprom
     ref_hum = eeprom_read_byte(EEPROM_REF_HUM);
 
+    //the display won't update automatically until the value is changed
+    io_print_nbr(ref_hum);
+
     //everything is set up, globally enable interrupts
     sei();
 }
